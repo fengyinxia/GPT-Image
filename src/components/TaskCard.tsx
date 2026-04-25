@@ -204,13 +204,16 @@ export default function TaskCard({
               <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
                 {task.params.quality}
               </span>
-                <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
-                  {task.params.size}
-                </span>
-                <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
-                  {task.params.output_format}
-                </span>
-              </div>
+              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
+                {task.params.model ?? 'gpt-image-2'}
+              </span>
+              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
+                {task.params.size}
+              </span>
+              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
+                {task.params.output_format}
+              </span>
+            </div>
             {/* 操作按钮 */}
             <div
               className="flex gap-1 justify-end flex-shrink-0"

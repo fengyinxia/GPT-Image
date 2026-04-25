@@ -62,36 +62,44 @@
 
 ### 🐳 方式一：Docker 部署 (推荐)
 
-项目已将镜像发布至 GitHub Container Registry。你可以通过环境变量 `API_URL` 注入默认的 API 节点。
-
-**使用 Docker CLI：**
-
-```bash
-docker run -d -p 8080:80 \
-  -e API_URL=https://api.openai.com \
-  ghcr.io/cooksleep/gpt_image_playground:latest
-```
-
-**使用 Docker Compose：**
+前端不会保存 API URL 或 API Key。真实的 API 配置放在 Python 后端本地配置文件或环境变量中，推荐用 Docker Compose 同时启动前后端：
 
 ```yaml
 services:
-  gpt-image-playground:
-    image: ghcr.io/cooksleep/gpt_image_playground:latest
-    environment:
-      - API_URL=https://api.openai.com
+  frontend:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
     ports:
-      - "8080:80"
+      - "2345:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.backend
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com}
+      OPENAI_TIMEOUT: ${OPENAI_TIMEOUT:-300}
     restart: unless-stopped
 ```
 
-浏览器访问 `http://localhost:8080`，在页面右上角设置中填入 API Key 即可使用。
+启动：
 
-*(注：官方镜像同时提供带版本号的标签，如 `0.1.11` 或 `0.1`)*
+```bash
+OPENAI_API_KEY=sk-xxxx docker compose up --build
+```
+
+浏览器访问 `http://localhost:2345` 即可使用。
 
 ### 🌐 方式二：GitHub Pages 自动部署
 
 本项目内置了 GitHub Actions 工作流。当你将本项目 Fork 到自己的仓库后，只需推送打上 `v*` 标签的代码，即可自动触发部署。
+
+注意：当前版本的前端默认请求同源 `/v1/*`，GitHub Pages 只能托管静态文件，不能运行 Python 后端。若使用 GitHub Pages，需要额外部署后端，并通过自己的网关或反向代理把 `/v1/*` 转发到 Python 后端。
 
 1. 进入你的仓库 **Settings → Pages**。
 2. 将 **Source** 选项改为 **GitHub Actions**。
@@ -104,18 +112,22 @@ services:
 
 ### 💻 方式三：本地开发与自行构建
 
-1. **环境准备 (可选)**
-   你可以在项目根目录新建 `.env.local` 文件，配置构建时的默认 API URL：
+1. **启动 Python 后端**
    ```bash
-   VITE_DEFAULT_API_URL=https://api.openai.com
+   cd backend
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install -r requirements.txt
+   uvicorn main:app --host 0.0.0.0 --port 8000
    ```
+   后端会优先读取 `backend/config.local.json`。可以先复制 `backend/config.local.json.example` 并填入自己的 key。
 
-2. **安装依赖与启动开发服务器**
+2. **安装依赖与启动前端开发服务器**
    ```bash
    npm install
    npm run dev
    ```
-   随后浏览器访问 `http://localhost:5173`。
+   随后浏览器访问 `http://localhost:5173`。Vite 会把 `/v1/*` 代理到 `http://localhost:8000`。
 
 3. **构建静态产物**
    ```bash
@@ -125,18 +137,15 @@ services:
 
 ---
 
-## 🛠️ API 配置说明
+## 🛠️ 后端 API 配置说明
 
-点击页面右上角的设置图标，你可以随时更改 API 相关的配置。
-应用支持通过 URL 查询参数快速填充配置，非常适合书签或分享给他人使用：
-- `?apiUrl=https://你的代理地址.com`
-- `?apiKey=sk-xxxx`
+Python 后端会代理前端的 `/v1/images/generations` 和 `/v1/images/edits` 请求，并在服务端附加真实的 `Authorization` 请求头。
+本地开发时优先读取 `backend/config.local.json`，不存在时再回退到环境变量。
 
-例如：
-- 接入 New API 聊天应用：
-  ```
-  https://cooksleep.github.io/gpt_image_playground?apiUrl={address}&apiKey={key}
-  ```
+- `openai_api_key` / `OPENAI_API_KEY`：必填，真实 API Key。
+- `openai_base_url` / `OPENAI_BASE_URL`：可选，默认 `https://api.openai.com`。
+- `openai_timeout` / `OPENAI_TIMEOUT`：可选，默认 `300` 秒。
+- `cors_allow_origins` / `CORS_ALLOW_ORIGINS`：可选，默认允许 Vite 本地开发地址。
 
 ---
 

@@ -1,2 +1,7 @@
 node_modules/
 dist/
+.ace-tool/
+.claude/
+backend/.venv/
+backend/__pycache__/
+backend/config.local.json

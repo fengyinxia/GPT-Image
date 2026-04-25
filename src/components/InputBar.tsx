@@ -39,8 +39,6 @@ export default function InputBar() {
   const clearInputImages = useStore((s) => s.clearInputImages)
   const params = useStore((s) => s.params)
   const setParams = useStore((s) => s.setParams)
-  const settings = useStore((s) => s.settings)
-  const setShowSettings = useStore((s) => s.setShowSettings)
   const setLightboxImageId = useStore((s) => s.setLightboxImageId)
   const setConfirmDialog = useStore((s) => s.setConfirmDialog)
 
@@ -51,7 +49,6 @@ export default function InputBar() {
   const prevHeightRef = useRef(42)
 
   const [isDragging, setIsDragging] = useState(false)
-  const [submitHover, setSubmitHover] = useState(false)
   const [attachHover, setAttachHover] = useState(false)
   const [mobileCollapsed, setMobileCollapsed] = useState(false)
   const [showSizePicker, setShowSizePicker] = useState(false)
@@ -64,7 +61,7 @@ export default function InputBar() {
   const dragCounter = useRef(0)
   const isMobile = useIsMobile()
 
-  const canSubmit = (prompt.trim() || inputImages.length) && settings.apiKey
+  const canSubmit = Boolean(prompt.trim() || inputImages.length)
   const atImageLimit = inputImages.length >= API_MAX_IMAGES
 
   useEffect(() => {
@@ -354,6 +351,9 @@ export default function InputBar() {
         >
           {normalizeImageSize(params.size) || DEFAULT_PARAMS.size}
         </button>
+        <span className="ml-1 truncate font-mono text-[10px] text-gray-400 dark:text-gray-500">
+          {params.model}
+        </span>
       </label>
       <label className="flex flex-col gap-0.5">
         <span className="text-gray-400 dark:text-gray-500 ml-1">质量</span>
@@ -466,7 +466,8 @@ export default function InputBar() {
       {showSizePicker && (
         <SizePickerModal
           currentSize={params.size}
-          onSelect={(size) => setParams({ size })}
+          currentModel={params.model}
+          onSelect={(size, model) => setParams({ size, model })}
           onClose={() => setShowSizePicker(false)}
         />
       )}
@@ -540,19 +541,12 @@ export default function InputBar() {
                 </div>
                 <div
                   className="relative"
-                  onMouseEnter={() => setSubmitHover(true)}
-                  onMouseLeave={() => setSubmitHover(false)}
                 >
-                  <ButtonTooltip visible={!settings.apiKey && submitHover} text="尚未完成 API 配置，请在右上角设置中进行" />
                   <button
-                    onClick={() => settings.apiKey ? submitTask() : setShowSettings(true)}
-                    disabled={settings.apiKey ? !canSubmit : false}
-                    className={`p-2.5 rounded-xl transition-all shadow-sm hover:shadow ${
-                      !settings.apiKey
-                        ? 'bg-gray-300 dark:bg-white/[0.06] text-white cursor-pointer'
-                        : 'bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-white/[0.04] disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
-                    title={settings.apiKey ? '生成 (Ctrl+Enter)' : '请先配置 API'}
+                    onClick={() => submitTask()}
+                    disabled={!canSubmit}
+                    className="p-2.5 rounded-xl transition-all shadow-sm hover:shadow bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-white/[0.04] disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="生成 (Ctrl+Enter)"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -594,18 +588,11 @@ export default function InputBar() {
                 </div>
                 <div
                   className="relative flex-1"
-                  onMouseEnter={() => setSubmitHover(true)}
-                  onMouseLeave={() => setSubmitHover(false)}
                 >
-                  <ButtonTooltip visible={!settings.apiKey && submitHover} text="尚未完成 API 配置，请在右上角设置中进行" />
                   <button
-                    onClick={() => settings.apiKey ? submitTask() : setShowSettings(true)}
-                    disabled={settings.apiKey ? !canSubmit : false}
-                    className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm ${
-                      !settings.apiKey
-                        ? 'bg-gray-300 dark:bg-white/[0.06] text-white cursor-pointer'
-                        : 'bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-white/[0.04] disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
+                    onClick={() => submitTask()}
+                    disabled={!canSubmit}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-white/[0.04] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />

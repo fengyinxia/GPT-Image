@@ -1,0 +1,7 @@
+{
+  "openai_api_key": "sk-xxxx",
+  "openai_base_url": "https://api.openai.com",
+  "openai_timeout": "300",
+  "cors_allow_origins": "http://localhost:5173,http://127.0.0.1:5173",
+  "http_proxy": ""
+}

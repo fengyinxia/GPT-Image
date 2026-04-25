@@ -1,7 +1,13 @@
-node_modules
-dist
-.git
+node_modules/
+dist/
+.git/
+.github/
+.claude/
+.ace-tool/
+docs/
+backend/.venv/
+backend/__pycache__/
+backend/config.local.json
 .gitignore
 *.md
-Dockerfile
 .dockerignore

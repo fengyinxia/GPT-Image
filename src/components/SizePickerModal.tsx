@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import type { ImageModel } from '../types'
 import { calculateImageSize, normalizeImageSize, parseRatio, type SizeTier } from '../lib/size'
 
 const TIERS: SizeTier[] = ['1K', '2K', '4K']
@@ -15,7 +16,8 @@ const RATIOS = [
 
 interface Props {
   currentSize: string
-  onSelect: (size: string) => void
+  currentModel: ImageModel
+  onSelect: (size: string, model: ImageModel) => void
   onClose: () => void
 }
 
@@ -39,7 +41,19 @@ function findPresetForSize(size: string) {
   return null
 }
 
-export default function SizePickerModal({ currentSize, onSelect, onClose }: Props) {
+function modelForTier(tier: SizeTier): ImageModel {
+  if (tier === '2K') return 'gpt-image-2-2k'
+  if (tier === '4K') return 'gpt-image-2-4k'
+  return 'gpt-image-2'
+}
+
+function tierForModel(model: ImageModel): SizeTier {
+  if (model === 'gpt-image-2-2k') return '2K'
+  if (model === 'gpt-image-2-4k') return '4K'
+  return '1K'
+}
+
+export default function SizePickerModal({ currentSize, currentModel, onSelect, onClose }: Props) {
   const currentPreset = findPresetForSize(currentSize)
   const currentParsedSize = parseSize(currentSize)
   const [mode, setMode] = useState<Mode>(() => {
@@ -49,7 +63,7 @@ export default function SizePickerModal({ currentSize, onSelect, onClose }: Prop
   })
 
   // Ratio mode state
-  const [tier, setTier] = useState<SizeTier>(currentPreset?.tier ?? '1K')
+  const [tier, setTier] = useState<SizeTier>(currentPreset?.tier ?? tierForModel(currentModel))
   const [ratio, setRatio] = useState(currentPreset?.ratio ?? '1:1')
   const [customRatio, setCustomRatio] = useState('16:9')
 
@@ -80,9 +94,11 @@ export default function SizePickerModal({ currentSize, onSelect, onClose }: Prop
     return ''
   }, [mode, tier, activeRatio, customW, customH])
 
+  const previewModel = mode === 'auto' ? modelForTier('1K') : modelForTier(tier)
+
   const applySize = () => {
     if (!previewSize) return
-    onSelect(previewSize)
+    onSelect(previewSize, previewModel)
     onClose()
   }
 
@@ -201,6 +217,16 @@ export default function SizePickerModal({ currentSize, onSelect, onClose }: Prop
             {mode === 'resolution' && (
               <div className="space-y-5 animate-fade-in">
                 <section>
+                  <div className="mb-2 text-xs font-medium text-gray-400 dark:text-gray-500">基准分辨率</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {TIERS.map((item) => (
+                      <button key={item} className={buttonClass(tier === item)} onClick={() => setTier(item)}>
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+                <section>
                   <div className="mb-4 text-xs font-medium text-gray-400 dark:text-gray-500">输入具体像素值</div>
                   <div className="flex items-center gap-4">
                     <label className="flex-1">
@@ -246,6 +272,9 @@ export default function SizePickerModal({ currentSize, onSelect, onClose }: Prop
             <div className="text-xs text-gray-400 dark:text-gray-500">将使用</div>
             <div className="mt-1 font-mono text-lg font-semibold text-gray-800 dark:text-gray-100">
               {previewSize || '尺寸无效'}
+            </div>
+            <div className="mt-1 font-mono text-xs text-gray-400 dark:text-gray-500">
+              {previewModel}
             </div>
           </div>
         </div>

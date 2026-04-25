@@ -1,9 +1,7 @@
 import { useStore } from '../store'
-import { useVersionCheck } from '../hooks/useVersionCheck'
 
 export default function Header() {
   const setShowSettings = useStore((s) => s.setShowSettings)
-  const { hasUpdate, latestRelease, dismiss } = useVersionCheck()
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 dark:bg-gray-950/80 backdrop-blur border-b border-gray-200 dark:border-white/[0.08]">
@@ -23,19 +21,6 @@ export default function Header() {
           GPT Image Playground
         </h1>
         <div className="flex items-center gap-1">
-          {/* 新版本提示 */}
-          {hasUpdate && latestRelease && (
-            <a
-              href={latestRelease.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={dismiss}
-              className="px-2 py-1 rounded-lg text-[11px] font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors animate-fade-in"
-              title={`新版本 ${latestRelease.tag}`}
-            >
-              New
-            </a>
-          )}
           <button
             onClick={() => setShowSettings(true)}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"

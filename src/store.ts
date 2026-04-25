@@ -101,7 +101,11 @@ export const useStore = create<AppState>()(
     (set, get) => ({
       // Settings
       settings: { ...DEFAULT_SETTINGS },
-      setSettings: (s) => set((st) => ({ settings: { ...st.settings, ...s } })),
+      setSettings: (s) => set((st) => ({
+        settings: {
+          timeout: s.timeout ?? st.settings.timeout,
+        },
+      })),
 
       // Input
       prompt: '',
@@ -162,6 +166,21 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'gpt-image-playground',
+      merge: (persisted, current) => {
+        const state = persisted as Partial<AppState>
+        return {
+          ...current,
+          ...state,
+          settings: {
+            timeout: state.settings?.timeout ?? current.settings.timeout,
+          },
+          params: {
+            ...current.params,
+            ...state.params,
+            model: state.params?.model ?? current.params.model,
+          },
+        }
+      },
       partialize: (state) => ({
         settings: state.settings,
         params: state.params,
@@ -204,12 +223,6 @@ export async function initStore() {
 export async function submitTask() {
   const { settings, prompt, inputImages, params, tasks, setTasks, showToast } =
     useStore.getState()
-
-  if (!settings.apiKey) {
-    showToast('请先在设置中配置 API Key', 'error')
-    useStore.getState().setShowSettings(true)
-    return
-  }
 
   if (!prompt.trim() && !inputImages.length) {
     showToast('请输入提示词或添加参考图', 'error')

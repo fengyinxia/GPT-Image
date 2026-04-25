@@ -314,6 +314,11 @@ export default function DetailModal() {
             </h3>
             <div className="grid grid-cols-2 gap-2 text-xs mb-4">
               <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-gray-400 dark:text-gray-500">模型</span>
+                <br />
+                <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.model ?? 'gpt-image-2'}</span>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
                 <span className="text-gray-400 dark:text-gray-500">尺寸</span>
                 <br />
                 <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.size}</span>

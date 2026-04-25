@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { normalizeBaseUrl } from '../lib/api'
 import { useStore, exportData, importData, clearAllData } from '../store'
 import { DEFAULT_SETTINGS, type AppSettings } from '../types'
 import { useCloseOnEscape } from '../hooks/useCloseOnEscape'
@@ -13,7 +12,6 @@ export default function SettingsModal() {
   const importInputRef = useRef<HTMLInputElement>(null)
   const [draft, setDraft] = useState<AppSettings>(settings)
   const [timeoutInput, setTimeoutInput] = useState(String(settings.timeout))
-  const [showApiKey, setShowApiKey] = useState(false)
 
   useEffect(() => {
     if (showSettings) {
@@ -25,9 +23,6 @@ export default function SettingsModal() {
   const commitSettings = (nextDraft: AppSettings) => {
     const normalizedDraft = {
       ...nextDraft,
-      baseUrl: normalizeBaseUrl(nextDraft.baseUrl.trim() || DEFAULT_SETTINGS.baseUrl),
-      apiKey: nextDraft.apiKey,
-      model: nextDraft.model.trim() || DEFAULT_SETTINGS.model,
       timeout: Number(nextDraft.timeout) || DEFAULT_SETTINGS.timeout,
     }
     setDraft(normalizedDraft)
@@ -102,72 +97,12 @@ export default function SettingsModal() {
               <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
-              API 配置
+              生成配置
             </h4>
             <div className="space-y-4">
-              <label className="block">
-                <span className="block text-xs text-gray-500 dark:text-gray-400 mb-1">API URL</span>
-                <input
-                  value={draft.baseUrl}
-                  onChange={(e) => setDraft((prev) => ({ ...prev, baseUrl: e.target.value }))}
-                  onBlur={(e) => commitSettings({ ...draft, baseUrl: e.target.value })}
-                  type="text"
-                  placeholder={DEFAULT_SETTINGS.baseUrl}
-                  className="w-full rounded-xl border border-gray-200/70 bg-white/60 px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-300 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-gray-200 dark:focus:border-blue-500/50"
-                />
-                <div className="mt-1 text-[10px] text-gray-400 dark:text-gray-500">
-                  支持通过查询参数覆盖：<code className="bg-gray-100 dark:bg-white/[0.06] px-1 py-0.5 rounded">?apiUrl=</code>
-                </div>
-              </label>
-
-              <div className="block">
-                <span className="block text-xs text-gray-500 dark:text-gray-400 mb-1">API Key</span>
-                <div className="relative">
-                  <input
-                    value={draft.apiKey}
-                    onChange={(e) => setDraft((prev) => ({ ...prev, apiKey: e.target.value }))}
-                    onBlur={(e) => commitSettings({ ...draft, apiKey: e.target.value })}
-                    type={showApiKey ? 'text' : 'password'}
-                    placeholder="sk-..."
-                    className="w-full rounded-xl border border-gray-200/70 bg-white/60 px-3 py-2 pr-10 text-sm text-gray-700 outline-none transition focus:border-blue-300 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-gray-200 dark:focus:border-blue-500/50"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowApiKey((v) => !v)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showApiKey ? (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                        <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
-                        <line x1="1" y1="1" x2="23" y2="23" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                <div className="mt-1 text-[10px] text-gray-400 dark:text-gray-500">
-                  支持通过查询参数覆盖：<code className="bg-gray-100 dark:bg-white/[0.06] px-1 py-0.5 rounded">?apiKey=</code>
-                </div>
+              <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-3 text-xs text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
+                API URL 和 API Key 已移到 Python 后端，通过后端环境变量配置。
               </div>
-
-              <label className="block">
-                <span className="block text-xs text-gray-500 dark:text-gray-400 mb-1">模型 ID</span>
-                <input
-                  value={draft.model}
-                  onChange={(e) => setDraft((prev) => ({ ...prev, model: e.target.value }))}
-                  onBlur={(e) => commitSettings({ ...draft, model: e.target.value })}
-                  type="text"
-                  placeholder="gpt-image-2"
-                  className="w-full rounded-xl border border-gray-200/70 bg-white/60 px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-300 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-gray-200 dark:focus:border-blue-500/50"
-                />
-              </label>
 
               <label className="block">
                 <span className="block text-xs text-gray-500 dark:text-gray-400 mb-1">请求超时 (秒)</span>

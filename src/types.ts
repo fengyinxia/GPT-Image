@@ -1,24 +1,17 @@
 // ===== 设置 =====
 
 export interface AppSettings {
-  baseUrl: string
-  apiKey: string
-  model: string
   timeout: number
 }
 
-const DEFAULT_BASE_URL = import.meta.env.VITE_DEFAULT_API_URL?.trim() || 'https://api.openai.com'
-
 export const DEFAULT_SETTINGS: AppSettings = {
-  baseUrl: DEFAULT_BASE_URL,
-  apiKey: '',
-  model: 'gpt-image-2',
   timeout: 300,
 }
 
 // ===== 任务参数 =====
 
 export interface TaskParams {
+  model: ImageModel
   size: string
   quality: 'auto' | 'low' | 'medium' | 'high'
   output_format: 'png' | 'jpeg' | 'webp'
@@ -27,7 +20,10 @@ export interface TaskParams {
   n: number
 }
 
+export type ImageModel = 'gpt-image-2' | 'gpt-image-2-2k' | 'gpt-image-2-4k'
+
 export const DEFAULT_PARAMS: TaskParams = {
+  model: 'gpt-image-2',
   size: 'auto',
   quality: 'auto',
   output_format: 'png',
@@ -79,11 +75,12 @@ export interface StoredImage {
 // ===== API 请求体 =====
 
 export interface ImageGenerationRequest {
-  model: string
+  model: ImageModel
   prompt: string
   size: string
   quality: string
   output_format: string
+  response_format: 'b64_json'
   moderation: string
   output_compression?: number
   n?: number
