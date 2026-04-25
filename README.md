@@ -1,8 +1,8 @@
 # GPT Image Playground
 
-基于 OpenAI `gpt-image-2` 接口的图片生成与编辑工具。提供简洁的 Web UI，支持文本生成图片、参考图编辑、可视化参数调节、历史记录管理与本地数据导入导出。
+基于 OpenAI 兼容图片接口的图片生成与编辑工具。项目包含 React 前端和 Python 后端代理：前端只请求本项目后端，真实的 API Base URL 与 Key 只保存在服务端，避免泄露到浏览器。
 
-**在线体验：** [https://cooksleep.github.io/gpt_image_playground/](https://cooksleep.github.io/gpt_image_playground/)
+**仓库地址：** [https://github.com/fengyinxia/GPT-Image](https://github.com/fengyinxia/GPT-Image)
 
 ---
 
@@ -35,9 +35,11 @@
 - **文本生图**：输入提示词，调用 `images/generations` 接口生成图片。
 - **参考图编辑**：支持上传最多 16 张参考图，调用 `images/edits` 接口进行图片编辑。支持文件选择、粘贴和拖拽三种方式。
 - **批量生成**：单次可设置生成多张图片。
+- **后端代理**：API Key、上游地址、超时时间等敏感配置放在 Python 后端，浏览器不再保存密钥。
 
 ### ⚙️ 精细化参数控制
 - **智能尺寸选择器**：支持 `auto`、按 `1K / 2K / 4K` 结合常用比例自动计算分辨率，同时也支持手动输入自定义宽高。
+- **模型随基准分辨率切换**：`1K` 使用 `gpt-image-2`，`2K` 使用 `gpt-image-2-2k`，`4K` 使用 `gpt-image-2-4k`。
 - **自动规整**：为了兼容模型限制，自定义尺寸会自动向下规整到最接近的 16 倍数。
 - **预设反推**：打开尺寸选择弹窗时，会自动根据当前尺寸匹配对应的预设比例。
 - **其他选项**：支持调整质量 (`low`, `medium`, `high`)、输出格式 (`PNG`, `JPEG`, `WebP`)、压缩率 (0-100) 以及审核强度。
@@ -62,44 +64,41 @@
 
 ### 🐳 方式一：Docker 部署 (推荐)
 
-前端不会保存 API URL 或 API Key。真实的 API 配置放在 Python 后端本地配置文件或环境变量中，推荐用 Docker Compose 同时启动前后端：
+推荐用 Docker Compose 同时启动前后端。前端容器负责页面和 `/v1/*` 反向代理，后端容器负责转发到上游 OpenAI 兼容接口。
 
-```yaml
-services:
-  frontend:
-    build:
-      context: .
-      dockerfile: deploy/Dockerfile
-    ports:
-      - "2345:80"
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-  backend:
-    build:
-      context: .
-      dockerfile: deploy/Dockerfile.backend
-    environment:
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com}
-      OPENAI_TIMEOUT: ${OPENAI_TIMEOUT:-300}
-    restart: unless-stopped
-```
-
-启动：
+Linux / macOS：
 
 ```bash
-OPENAI_API_KEY=sk-xxxx docker compose up --build
+export OPENAI_API_KEY="sk-xxxx"
+export OPENAI_BASE_URL="https://api.openai.com"
+docker compose up -d --build
 ```
 
-浏览器访问 `http://localhost:2345` 即可使用。
+Windows PowerShell：
+
+```powershell
+$env:OPENAI_API_KEY="sk-xxxx"
+$env:OPENAI_BASE_URL="https://api.openai.com"
+docker compose up -d --build
+```
+
+如果使用第三方兼容网关，把 `OPENAI_BASE_URL` 改成你的上游根地址，例如：
+
+```powershell
+$env:OPENAI_BASE_URL="http://13.229.138.59:8181"
+```
+
+浏览器访问 `http://localhost:2345` 即可使用。停止服务：
+
+```bash
+docker compose down
+```
 
 ### 🌐 方式二：GitHub Pages 自动部署
 
 本项目内置了 GitHub Actions 工作流。当你将本项目 Fork 到自己的仓库后，只需推送打上 `v*` 标签的代码，即可自动触发部署。
 
-注意：当前版本的前端默认请求同源 `/v1/*`，GitHub Pages 只能托管静态文件，不能运行 Python 后端。若使用 GitHub Pages，需要额外部署后端，并通过自己的网关或反向代理把 `/v1/*` 转发到 Python 后端。
+注意：当前版本的前端默认请求同源 `/v1/*`，GitHub Pages 只能托管静态文件，不能运行 Python 后端。若使用 GitHub Pages，需要额外部署后端，并通过自己的网关或反向代理把 `/v1/*` 转发到 Python 后端，否则页面无法直接调用图片接口。
 
 1. 进入你的仓库 **Settings → Pages**。
 2. 将 **Source** 选项改为 **GitHub Actions**。
@@ -113,14 +112,30 @@ OPENAI_API_KEY=sk-xxxx docker compose up --build
 ### 💻 方式三：本地开发与自行构建
 
 1. **启动 Python 后端**
-   ```bash
+
+   Windows PowerShell：
+
+   ```powershell
    cd backend
+   copy config.local.json.example config.local.json
    python -m venv .venv
    .venv\Scripts\activate
    pip install -r requirements.txt
    uvicorn main:app --host 0.0.0.0 --port 8000
    ```
-   后端会优先读取 `backend/config.local.json`。可以先复制 `backend/config.local.json.example` 并填入自己的 key。
+
+   Linux / macOS：
+
+   ```bash
+   cd backend
+   cp config.local.json.example config.local.json
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   uvicorn main:app --host 0.0.0.0 --port 8000
+   ```
+
+   编辑 `backend/config.local.json`，填入自己的 `openai_api_key` 和 `openai_base_url`。
 
 2. **安装依赖与启动前端开发服务器**
    ```bash
@@ -142,10 +157,56 @@ OPENAI_API_KEY=sk-xxxx docker compose up --build
 Python 后端会代理前端的 `/v1/images/generations` 和 `/v1/images/edits` 请求，并在服务端附加真实的 `Authorization` 请求头。
 本地开发时优先读取 `backend/config.local.json`，不存在时再回退到环境变量。
 
+示例：
+
+```json
+{
+  "openai_api_key": "sk-xxxx",
+  "openai_base_url": "https://api.openai.com",
+  "openai_timeout": "300",
+  "cors_allow_origins": "http://localhost:5173,http://127.0.0.1:5173",
+  "http_proxy": ""
+}
+```
+
 - `openai_api_key` / `OPENAI_API_KEY`：必填，真实 API Key。
 - `openai_base_url` / `OPENAI_BASE_URL`：可选，默认 `https://api.openai.com`。
 - `openai_timeout` / `OPENAI_TIMEOUT`：可选，默认 `300` 秒。
 - `cors_allow_origins` / `CORS_ALLOW_ORIGINS`：可选，默认允许 Vite 本地开发地址。
+- `http_proxy` / `HTTP_PROXY`：可选，默认不使用系统代理；只有显式配置时才走代理。
+
+`backend/config.local.json` 已加入 `.gitignore`，不要把真实 Key 提交到仓库。
+
+---
+
+## 🧩 模型与尺寸对应关系
+
+模型 ID 不在设置页手动填写，而是由尺寸弹窗里的“基准分辨率”决定：
+
+| 基准分辨率 | 模型 ID |
+| --- | --- |
+| `1K` | `gpt-image-2` |
+| `2K` | `gpt-image-2-2k` |
+| `4K` | `gpt-image-2-4k` |
+
+选择 `auto` 时默认使用 `gpt-image-2`。
+
+---
+
+## 🔧 常见问题
+
+### 后端一直返回 502
+
+先看后端日志。502 通常表示 Python 后端已经收到请求，但上游接口失败。常见原因：
+
+- `OPENAI_BASE_URL` 不是 OpenAI 兼容 API 根地址。
+- 上游网关没有支持 `/v1/images/generations` 或 `/v1/images/edits`。
+- API Key 无效、账号无可用额度或上游模型不可用。
+- 某些网关开启了 WebSocket/升级协议模式，导致普通 HTTP POST 返回非标准响应。
+
+### 浏览器还显示旧设置
+
+如果之前开过页面，可能是浏览器缓存或 Service Worker 缓存旧资源。可以先强制刷新；仍不行就在开发者工具里注销 Service Worker 并清理站点数据。
 
 ---
 
@@ -156,6 +217,8 @@ Python 后端会代理前端的 `/v1/images/generations` 和 `/v1/images/edits` 
 - **样式**：[Tailwind CSS 3](https://tailwindcss.com/)
 - **状态管理**：[Zustand](https://zustand.docs.pmnd.rs/)
 - **数据存储**：浏览器的 IndexedDB API
+- **后端**：[FastAPI](https://fastapi.tiangolo.com/) + [HTTPX](https://www.python-httpx.org/)
+- **部署**：Docker Compose + Nginx
 
 ## 📄 许可证
 
