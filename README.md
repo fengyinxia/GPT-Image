@@ -1,4 +1,6 @@
-# GPT Image Playground
+# 幻梦
+
+Fork 自 [https://github.com/CookSleep/gpt_image_playground](https://github.com/CookSleep/gpt_image_playground)
 
 一个基于 OpenAI 兼容图片接口的生图 / 改图工具。前端只请求本项目后端，真实的上游地址和 API Key 保存在服务端。
 
