@@ -316,7 +316,14 @@ export default function DetailModal() {
               <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
                 <span className="text-gray-400 dark:text-gray-500">模型</span>
                 <br />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.model ?? 'gpt-image-2'}</span>
+                <span className="text-gray-700 dark:text-gray-300 font-medium">gpt-image-2</span>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-gray-400 dark:text-gray-500">基准分辨率</span>
+                <br />
+                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                  {(task.params as any).base_resolution ?? ((task.params as any).model === 'gpt-image-2-4k' ? '4K' : (task.params as any).model === 'gpt-image-2-2k' ? '2K' : '1K')}
+                </span>
               </div>
               <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
                 <span className="text-gray-400 dark:text-gray-500">尺寸</span>
@@ -343,15 +350,6 @@ export default function DetailModal() {
                 <br />
                 <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.n}</span>
               </div>
-              {task.params.output_compression != null && (
-                <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                  <span className="text-gray-400 dark:text-gray-500">压缩率</span>
-                  <br />
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">
-                    {task.params.output_compression}
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* 时间 */}

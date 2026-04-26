@@ -9,6 +9,7 @@ import httpx
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.datastructures import UploadFile
 
 
 DEFAULT_BASE_URL = "https://api.openai.com"
@@ -18,6 +19,7 @@ FORWARDED_REQUEST_HEADERS = frozenset({"accept", "content-type"})
 RETURNED_RESPONSE_HEADERS = frozenset({"cache-control", "content-type"})
 PROXY_PATHS = frozenset({"images/generations", "images/edits"})
 CONFIG_FILE = Path(__file__).with_name("config.local.json")
+IMAGE_MODEL = "gpt-image-2"
 
 
 class ConfigError(RuntimeError):
@@ -132,16 +134,73 @@ def build_upstream_protocol_error_message(base_url: str, path: str, exc: Excepti
     )
 
 
-def build_upstream_headers(request: Request, api_key: str) -> dict[str, str]:
+def build_upstream_headers(
+    request: Request,
+    api_key: str,
+    *,
+    include_content_type: bool,
+) -> dict[str, str]:
     headers = {
         name: value
         for name, value in request.headers.items()
         if name.lower() in FORWARDED_REQUEST_HEADERS
     }
+    if not include_content_type:
+        headers.pop("content-type", None)
     headers["authorization"] = f"Bearer {api_key}"
     headers["cache-control"] = "no-store, no-cache, max-age=0"
     headers["pragma"] = "no-cache"
     return headers
+
+
+async def build_upstream_request_options(request: Request) -> dict[str, Any]:
+    content_type = request.headers.get("content-type", "").lower()
+
+    if content_type.startswith("application/json"):
+        try:
+            payload = json.loads(await request.body())
+        except json.JSONDecodeError as exc:
+            raise ConfigError(f"请求 JSON 格式无效：{exc}") from exc
+        if not isinstance(payload, dict):
+            raise ConfigError("请求 JSON 必须是对象")
+        payload["model"] = IMAGE_MODEL
+        return {
+            "content": json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            "include_content_type": True,
+        }
+
+    if content_type.startswith("multipart/form-data"):
+        form = await request.form()
+        data: list[tuple[str, str]] = [("model", IMAGE_MODEL)]
+        files: list[tuple[str, tuple[str, bytes, str]]] = []
+
+        for key, value in form.multi_items():
+            if key == "model":
+                continue
+            if isinstance(value, UploadFile):
+                files.append(
+                    (
+                        key,
+                        (
+                            value.filename or "upload",
+                            await value.read(),
+                            value.content_type or "application/octet-stream",
+                        ),
+                    )
+                )
+                continue
+            data.append((key, str(value)))
+
+        return {
+            "data": data,
+            "files": files,
+            "include_content_type": False,
+        }
+
+    return {
+        "content": await request.body(),
+        "include_content_type": True,
+    }
 
 
 def build_http_client(config: AppConfig) -> httpx.AsyncClient:
@@ -193,12 +252,25 @@ async def proxy_openai_images(path: str, request: Request) -> Response:
         )
 
     target_url = build_upstream_url(config.base_url, path)
-    headers = build_upstream_headers(request, config.api_key)
-    body = await request.body()
+
+    try:
+        upstream_options = await build_upstream_request_options(request)
+    except ConfigError as exc:
+        return JSONResponse(
+            {"error": {"message": str(exc), "type": "invalid_request_error"}},
+            status_code=400,
+        )
+
+    include_content_type = bool(upstream_options.pop("include_content_type", True))
+    headers = build_upstream_headers(
+        request,
+        config.api_key,
+        include_content_type=include_content_type,
+    )
 
     try:
         async with build_http_client(config) as client:
-            upstream = await client.post(target_url, headers=headers, content=body)
+            upstream = await client.post(target_url, headers=headers, **upstream_options)
     except httpx.RemoteProtocolError as exc:
         return JSONResponse(
             {

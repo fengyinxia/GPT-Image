@@ -54,9 +54,6 @@ export default function InputBar() {
   const [showSizePicker, setShowSizePicker] = useState(false)
   const handleRef = useRef<HTMLDivElement>(null)
   const dragTouchRef = useRef({ startY: 0, moved: false })
-  const [outputCompressionInput, setOutputCompressionInput] = useState(
-    params.output_compression == null ? '' : String(params.output_compression),
-  )
   const [nInput, setNInput] = useState(String(params.n))
   const dragCounter = useRef(0)
   const isMobile = useIsMobile()
@@ -65,31 +62,8 @@ export default function InputBar() {
   const atImageLimit = inputImages.length >= API_MAX_IMAGES
 
   useEffect(() => {
-    setOutputCompressionInput(
-      params.output_compression == null ? '' : String(params.output_compression),
-    )
-  }, [params.output_compression])
-
-  useEffect(() => {
     setNInput(String(params.n))
   }, [params.n])
-
-  const commitOutputCompression = useCallback(() => {
-    if (outputCompressionInput.trim() === '') {
-      setOutputCompressionInput('')
-      setParams({ output_compression: null })
-      return
-    }
-
-    const nextValue = Number(outputCompressionInput)
-    if (Number.isNaN(nextValue)) {
-      setOutputCompressionInput(params.output_compression == null ? '' : String(params.output_compression))
-      return
-    }
-
-    setOutputCompressionInput(String(nextValue))
-    setParams({ output_compression: nextValue })
-  }, [outputCompressionInput, params.output_compression, setParams])
 
   const commitN = useCallback(() => {
     const nextValue = Number(nInput)
@@ -352,7 +326,7 @@ export default function InputBar() {
           {normalizeImageSize(params.size) || DEFAULT_PARAMS.size}
         </button>
         <span className="ml-1 truncate font-mono text-[10px] text-gray-400 dark:text-gray-500">
-          {params.model}
+          {params.base_resolution} · gpt-image-2
         </span>
       </label>
       <label className="flex flex-col gap-0.5">
@@ -383,21 +357,16 @@ export default function InputBar() {
         />
       </label>
       <label className="flex flex-col gap-0.5">
-        <span className="text-gray-400 dark:text-gray-500 ml-1">压缩率</span>
-        <input
-          value={outputCompressionInput}
-          onChange={(e) => setOutputCompressionInput(e.target.value)}
-          onBlur={commitOutputCompression}
-          disabled={params.output_format === 'png'}
-          type="number"
-          min={0}
-          max={100}
-          placeholder="0-100"
-          className={`px-3 py-1.5 rounded-xl border border-gray-200/60 dark:border-white/[0.08] focus:outline-none text-xs transition-all duration-200 shadow-sm ${
-            params.output_format === 'png'
-              ? 'bg-gray-100/50 dark:bg-white/[0.05] opacity-50 cursor-not-allowed'
-              : 'bg-white/50 dark:bg-white/[0.03]'
-          }`}
+        <span className="text-gray-400 dark:text-gray-500 ml-1">基准</span>
+        <Select
+          value={params.base_resolution}
+          onChange={(val) => setParams({ base_resolution: val as any })}
+          options={[
+            { label: '1K', value: '1K' },
+            { label: '2K', value: '2K' },
+            { label: '4K', value: '4K' },
+          ]}
+          className={selectClass}
         />
       </label>
       <label className="flex flex-col gap-0.5">
@@ -466,8 +435,8 @@ export default function InputBar() {
       {showSizePicker && (
         <SizePickerModal
           currentSize={params.size}
-          currentModel={params.model}
-          onSelect={(size, model) => setParams({ size, model })}
+          currentBaseResolution={params.base_resolution}
+          onSelect={(size, baseResolution) => setParams({ size, base_resolution: baseResolution })}
           onClose={() => setShowSizePicker(false)}
         />
       )}

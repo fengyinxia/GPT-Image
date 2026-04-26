@@ -44,6 +44,13 @@ async function fetchImageUrlAsDataUrl(url: string, fallbackMime: string, signal:
   return blobToDataUrl(await response.blob(), fallbackMime)
 }
 
+function resolveRequestSize(params: TaskParams): string {
+  if (params.size && params.size !== 'auto') return params.size
+  if (params.base_resolution === '2K') return '2048x2048'
+  if (params.base_resolution === '4K') return '3840x2160'
+  return '1024x1024'
+}
+
 export interface CallApiOptions {
   settings: AppSettings
   prompt: string
@@ -61,6 +68,7 @@ export async function callImageApi(opts: CallApiOptions): Promise<CallApiResult>
   const { settings, prompt, params, inputImageDataUrls } = opts
   const isEdit = inputImageDataUrls.length > 0
   const mime = MIME_MAP[params.output_format] || 'image/png'
+  const requestSize = resolveRequestSize(params)
   const requestHeaders = {
     'Cache-Control': 'no-store, no-cache, max-age=0',
     Pragma: 'no-cache',
@@ -74,17 +82,13 @@ export async function callImageApi(opts: CallApiOptions): Promise<CallApiResult>
 
     if (isEdit) {
       const formData = new FormData()
-      formData.append('model', params.model)
+      formData.append('model', 'gpt-image-2')
       formData.append('prompt', prompt)
-      formData.append('size', params.size)
+      formData.append('size', requestSize)
       formData.append('quality', params.quality)
       formData.append('output_format', params.output_format)
       formData.append('moderation', params.moderation)
       formData.append('response_format', 'b64_json')
-
-      if (params.output_format !== 'png' && params.output_compression != null) {
-        formData.append('output_compression', String(params.output_compression))
-      }
 
       for (let i = 0; i < inputImageDataUrls.length; i++) {
         const dataUrl = inputImageDataUrls[i]
@@ -103,18 +107,15 @@ export async function callImageApi(opts: CallApiOptions): Promise<CallApiResult>
       })
     } else {
       const body: Record<string, unknown> = {
-        model: params.model,
+        model: 'gpt-image-2',
         prompt,
-        size: params.size,
+        size: requestSize,
         quality: params.quality,
         output_format: params.output_format,
         response_format: 'b64_json',
         moderation: params.moderation,
       }
 
-      if (params.output_format !== 'png' && params.output_compression != null) {
-        body.output_compression = params.output_compression
-      }
       if (params.n > 1) {
         body.n = params.n
       }

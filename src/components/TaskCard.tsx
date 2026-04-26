@@ -205,7 +205,7 @@ export default function TaskCard({
                 {task.params.quality}
               </span>
               <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
-                {task.params.model ?? 'gpt-image-2'}
+                {(task.params as any).base_resolution ?? ((task.params as any).model === 'gpt-image-2-4k' ? '4K' : (task.params as any).model === 'gpt-image-2-2k' ? '2K' : '1K')}
               </span>
               <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
                 {task.params.size}

@@ -39,10 +39,10 @@
 
 ### ⚙️ 精细化参数控制
 - **智能尺寸选择器**：支持 `auto`、按 `1K / 2K / 4K` 结合常用比例自动计算分辨率，同时也支持手动输入自定义宽高。
-- **模型随基准分辨率切换**：`1K` 使用 `gpt-image-2`，`2K` 使用 `gpt-image-2-2k`，`4K` 使用 `gpt-image-2-4k`。
+- **基准分辨率控制**：前端选择 `1K / 2K / 4K` 后换算为对应尺寸；请求模型始终固定为 `gpt-image-2`。
 - **自动规整**：为了兼容模型限制，自定义尺寸会自动向下规整到最接近的 16 倍数。
 - **预设反推**：打开尺寸选择弹窗时，会自动根据当前尺寸匹配对应的预设比例。
-- **其他选项**：支持调整质量 (`low`, `medium`, `high`)、输出格式 (`PNG`, `JPEG`, `WebP`)、压缩率 (0-100) 以及审核强度。
+- **其他选项**：支持调整质量 (`low`, `medium`, `high`)、输出格式 (`PNG`, `JPEG`, `WebP`) 以及审核强度。
 
 ### 📁 历史记录与工作流
 - **瀑布流任务卡片**：直观展示生成缩略图、提示词、参数和耗时。支持按状态筛选与关键词搜索。
@@ -66,23 +66,33 @@
 
 推荐用 Docker Compose 同时启动前后端。前端容器负责页面和 `/v1/*` 反向代理，后端容器负责转发到上游 OpenAI 兼容接口。
 
+如果想用本地配置文件，先创建：
+
+```bash
+cp backend/config.local.json.example backend/config.local.json
+```
+
+然后编辑 `backend/config.local.json`。`docker-compose.yml` 会把这个文件挂载到后端容器的 `/app/backend/config.local.json`。
+
 Linux / macOS：
 
 ```bash
-export OPENAI_API_KEY="sk-xxxx"
-export OPENAI_BASE_URL="https://api.openai.com"
 docker compose up -d --build
 ```
 
 Windows PowerShell：
 
 ```powershell
-$env:OPENAI_API_KEY="sk-xxxx"
-$env:OPENAI_BASE_URL="https://api.openai.com"
 docker compose up -d --build
 ```
 
-如果使用第三方兼容网关，把 `OPENAI_BASE_URL` 改成你的上游根地址，例如：
+也可以不用配置文件，直接用环境变量：
+
+```bash
+OPENAI_API_KEY="sk-xxxx" OPENAI_BASE_URL="https://api.openai.com" docker compose up -d --build
+```
+
+如果使用第三方兼容网关，把 `openai_base_url` 或 `OPENAI_BASE_URL` 改成你的上游根地址，例如：
 
 ```powershell
 $env:OPENAI_BASE_URL="http://13.229.138.59:8181"
@@ -181,15 +191,17 @@ Python 后端会代理前端的 `/v1/images/generations` 和 `/v1/images/edits` 
 
 ## 🧩 模型与尺寸对应关系
 
-模型 ID 不在设置页手动填写，而是由尺寸弹窗里的“基准分辨率”决定：
+模型 ID 不在设置页手动填写。为了兼容 codex2api 这类网关，后端会把图片请求里的 `model` 固定为 `gpt-image-2`。
 
-| 基准分辨率 | 模型 ID |
+前端的“基准分辨率”只负责决定默认请求尺寸：
+
+| 基准分辨率 | 默认尺寸 |
 | --- | --- |
-| `1K` | `gpt-image-2` |
-| `2K` | `gpt-image-2-2k` |
-| `4K` | `gpt-image-2-4k` |
+| `1K` | `1024x1024` |
+| `2K` | `2048x2048` |
+| `4K` | `3840x2160` |
 
-选择 `auto` 时默认使用 `gpt-image-2`。
+如果在尺寸弹窗里选择了明确比例或自定义宽高，则以实际尺寸为准。
 
 ---
 

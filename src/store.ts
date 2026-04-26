@@ -177,7 +177,7 @@ export const useStore = create<AppState>()(
           params: {
             ...current.params,
             ...state.params,
-            model: state.params?.model ?? current.params.model,
+            base_resolution: legacyBaseResolution(state.params as any),
           },
         }
       },
@@ -194,6 +194,13 @@ export const useStore = create<AppState>()(
 let uid = 0
 function genId(): string {
   return Date.now().toString(36) + (++uid).toString(36) + Math.random().toString(36).slice(2, 6)
+}
+
+function legacyBaseResolution(params: Partial<TaskParams> & { model?: string }) {
+  if (params.base_resolution) return params.base_resolution
+  if (params.model === 'gpt-image-2-4k') return '4K'
+  if (params.model === 'gpt-image-2-2k') return '2K'
+  return DEFAULT_PARAMS.base_resolution
 }
 
 /** 初始化：从 IndexedDB 加载任务和图片缓存，清理孤立图片 */
@@ -331,7 +338,10 @@ function updateTaskInStore(taskId: string, patch: Partial<TaskRecord>) {
 export async function reuseConfig(task: TaskRecord) {
   const { setPrompt, setParams, setInputImages, showToast } = useStore.getState()
   setPrompt(task.prompt)
-  setParams(task.params)
+  setParams({
+    ...task.params,
+    base_resolution: legacyBaseResolution(task.params as any),
+  })
 
   // 恢复输入图片
   const imgs: InputImage[] = []

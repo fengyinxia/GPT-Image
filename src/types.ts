@@ -11,23 +11,21 @@ export const DEFAULT_SETTINGS: AppSettings = {
 // ===== 任务参数 =====
 
 export interface TaskParams {
-  model: ImageModel
+  base_resolution: BaseResolution
   size: string
   quality: 'auto' | 'low' | 'medium' | 'high'
   output_format: 'png' | 'jpeg' | 'webp'
-  output_compression: number | null
   moderation: 'auto' | 'low'
   n: number
 }
 
-export type ImageModel = 'gpt-image-2' | 'gpt-image-2-2k' | 'gpt-image-2-4k'
+export type BaseResolution = '1K' | '2K' | '4K'
 
 export const DEFAULT_PARAMS: TaskParams = {
-  model: 'gpt-image-2',
+  base_resolution: '1K',
   size: 'auto',
   quality: 'auto',
   output_format: 'png',
-  output_compression: null,
   moderation: 'auto',
   n: 1,
 }
@@ -75,14 +73,13 @@ export interface StoredImage {
 // ===== API 请求体 =====
 
 export interface ImageGenerationRequest {
-  model: ImageModel
+  model: 'gpt-image-2'
   prompt: string
   size: string
   quality: string
   output_format: string
   response_format: 'b64_json'
   moderation: string
-  output_compression?: number
   n?: number
 }
 
