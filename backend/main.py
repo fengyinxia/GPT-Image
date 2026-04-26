@@ -9,9 +9,6 @@ import httpx
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from starlette.datastructures import UploadFile
-
-
 DEFAULT_BASE_URL = "https://api.openai.com"
 DEFAULT_CORS_ALLOW_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
 DEFAULT_TIMEOUT = 300.0
@@ -170,31 +167,9 @@ async def build_upstream_request_options(request: Request) -> dict[str, Any]:
         }
 
     if content_type.startswith("multipart/form-data"):
-        form = await request.form()
-        data: list[tuple[str, str]] = [("model", IMAGE_MODEL)]
-        files: list[tuple[str, tuple[str, bytes, str]]] = []
-
-        for key, value in form.multi_items():
-            if key == "model":
-                continue
-            if isinstance(value, UploadFile):
-                files.append(
-                    (
-                        key,
-                        (
-                            value.filename or "upload",
-                            await value.read(),
-                            value.content_type or "application/octet-stream",
-                        ),
-                    )
-                )
-                continue
-            data.append((key, str(value)))
-
         return {
-            "data": data,
-            "files": files,
-            "include_content_type": False,
+            "content": await request.body(),
+            "include_content_type": True,
         }
 
     return {
