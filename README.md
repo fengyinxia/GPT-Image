@@ -2,8 +2,6 @@
 
 基于 OpenAI 兼容图片接口的图片生成与编辑工具。项目包含 React 前端和 Python 后端代理：前端只请求本项目后端，真实的 API Base URL 与 Key 只保存在服务端，避免泄露到浏览器。
 
-**仓库地址：** [https://github.com/fengyinxia/GPT-Image](https://github.com/fengyinxia/GPT-Image)
-
 ---
 
 ## 📸 示例截图
@@ -96,28 +94,13 @@ OPENAI_API_KEY="sk-xxxx" OPENAI_BASE_URL="https://api.openai.com" docker compose
 $env:OPENAI_BASE_URL="http://13.229.138.59:8181"
 ```
 
-浏览器访问 `http://localhost:2345` 即可使用。停止服务：
+浏览器访问 `http://localhost:3399` 即可使用。停止服务：
 
 ```bash
 docker compose down
 ```
 
-### 🌐 方式二：GitHub Pages 自动部署
-
-本项目内置了 GitHub Actions 工作流。当你将本项目 Fork 到自己的仓库后，只需推送打上 `v*` 标签的代码，即可自动触发部署。
-
-注意：当前版本的前端默认请求同源 `/v1/*`，GitHub Pages 只能托管静态文件，不能运行 Python 后端。若使用 GitHub Pages，需要额外部署后端，并通过自己的网关或反向代理把 `/v1/*` 转发到 Python 后端，否则页面无法直接调用图片接口。
-
-1. 进入你的仓库 **Settings → Pages**。
-2. 将 **Source** 选项改为 **GitHub Actions**。
-3. 推送版本标签：
-   ```bash
-   git tag v0.1.2
-   git push origin v0.1.2
-   ```
-4. 等待 Action 运行完毕，即可访问你的专属 GitHub Pages。
-
-### 💻 方式三：本地开发与自行构建
+### 💻 方式二：本地开发与自行构建
 
 1. **启动 Python 后端**
 

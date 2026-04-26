@@ -4,48 +4,38 @@ export default function Header() {
   const setShowSettings = useStore((s) => s.setShowSettings)
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 dark:bg-gray-950/80 backdrop-blur border-b border-gray-200 dark:border-white/[0.08]">
-      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-gray-800 dark:text-gray-100 tracking-tight flex items-center gap-2">
-          <a
-            href="https://github.com/CookSleep/gpt_image_playground"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-            title="GitHub"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-            </svg>
-          </a>
-          GPT Image Playground
-        </h1>
-        <div className="flex items-center gap-1">
+    <header className="sticky top-0 z-40 overflow-hidden border-b border-slate-200/75 bg-stone-50/90 shadow-sm shadow-slate-950/[0.03] backdrop-blur-xl dark:border-white/[0.08] dark:bg-slate-950/90 dark:shadow-black/20">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_8%_20%,rgba(20,184,166,0.18),transparent_30%),radial-gradient(circle_at_72%_10%,rgba(245,158,11,0.16),transparent_28%),linear-gradient(135deg,rgba(15,23,42,0.03),transparent_45%)] dark:bg-[radial-gradient(circle_at_8%_20%,rgba(45,212,191,0.18),transparent_30%),radial-gradient(circle_at_72%_10%,rgba(251,191,36,0.13),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_45%)]" />
+        <div className="absolute inset-0 opacity-[0.055] [background-image:linear-gradient(90deg,currentColor_1px,transparent_1px),linear-gradient(0deg,currentColor_1px,transparent_1px)] [background-size:22px_22px] text-slate-900 dark:text-white" />
+      </div>
+
+      <div className="relative mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:min-h-24 sm:py-4">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <button
+            type="button"
             onClick={() => setShowSettings(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-[18px] border border-white/75 bg-white/80 text-teal-700 shadow-lg shadow-teal-900/[0.08] transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 dark:border-white/[0.12] dark:bg-white/[0.08] dark:text-teal-200 dark:shadow-black/25 dark:hover:bg-white/[0.12]"
             title="设置"
+            aria-label="打开设置"
           >
-            <svg
-              className="w-5 h-5 text-gray-600 dark:text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
+            <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 28 28" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7.5 6.5h13A2.5 2.5 0 0 1 23 9v10a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 5 19V9a2.5 2.5 0 0 1 2.5-2.5Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m8.5 18 4.2-4.2a1.6 1.6 0 0 1 2.2 0l1.1 1.1 1.2-1.2a1.6 1.6 0 0 1 2.2 0L22 16.3M9.5 10.5h.01" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19.5 3.5v3M22.2 4.8 20 7M16.8 4.8 19 7" />
             </svg>
           </button>
+
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-2">
+              <h1 className="truncate text-lg font-black tracking-tight text-slate-950 sm:text-2xl dark:text-white">
+                幻梦
+              </h1>
+              <span className="hidden shrink-0 rounded-full border border-teal-200/80 bg-teal-50 px-2.5 py-1 text-[11px] font-bold tracking-[0.08em] text-teal-700 sm:inline-flex dark:border-teal-300/20 dark:bg-teal-300/10 dark:text-teal-100">
+                所想即所得
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </header>

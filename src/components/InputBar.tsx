@@ -64,6 +64,10 @@ export default function InputBar() {
     setNInput(String(params.n))
   }, [params.n])
 
+  useEffect(() => {
+    setMobileCollapsed(isMobile)
+  }, [isMobile])
+
   const commitN = useCallback(() => {
     const nextValue = Number(nInput)
     const normalizedValue =
@@ -195,6 +199,15 @@ export default function InputBar() {
     const el = textareaRef.current
     if (!el) return
 
+    if (isMobile && mobileCollapsed) {
+      const compactHeight = 44
+      el.style.transition = 'height 150ms ease, border-color 200ms, box-shadow 200ms'
+      el.style.height = compactHeight + 'px'
+      el.style.overflowY = 'hidden'
+      prevHeightRef.current = compactHeight
+      return
+    }
+
     // 计算图片区域和其他固定元素占用的高度
     const imagesHeight = imagesRef.current?.offsetHeight ?? 0
     const fixedOverhead = imagesHeight + 140
@@ -221,7 +234,7 @@ export default function InputBar() {
     el.style.overflowY = desired > maxH ? 'auto' : 'hidden'
 
     prevHeightRef.current = targetH
-  }, [])
+  }, [isMobile, mobileCollapsed])
 
   useEffect(() => {
     adjustTextareaHeight()
@@ -265,14 +278,14 @@ export default function InputBar() {
     }
   }, [])
 
-  const selectClass = 'px-3 py-1.5 rounded-xl border border-gray-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.06] text-xs transition-all duration-200 shadow-sm'
+  const selectClass = 'px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.06] text-xs transition-all duration-200 shadow-sm'
 
   const renderImageThumbs = () => (
     <div ref={imagesRef}>
       <div className="grid grid-cols-[repeat(auto-fill,52px)] justify-between gap-x-2 gap-y-3 mb-3">
         {inputImages.map((img, idx) => (
           <div key={img.id} className="relative group inline-block">
-            <div className="relative w-[52px] h-[52px] rounded-xl overflow-hidden border border-gray-200 dark:border-white/[0.08] shadow-sm cursor-pointer">
+            <div className="relative w-[52px] h-[52px] rounded-xl overflow-hidden border border-slate-200 dark:border-white/[0.08] shadow-sm cursor-pointer">
               <img
                 src={img.dataUrl}
                 className="w-full h-full object-cover hover:opacity-90 transition-opacity"
@@ -300,7 +313,7 @@ export default function InputBar() {
               action: () => clearInputImages(),
             })
           }
-          className="w-[52px] h-[52px] rounded-xl border border-dashed border-gray-300 dark:border-white/[0.08] flex flex-col items-center justify-center gap-0.5 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:border-red-300 hover:bg-red-50/50 dark:hover:bg-red-950/30 transition-all cursor-pointer flex-shrink-0"
+          className="w-[52px] h-[52px] rounded-xl border border-dashed border-slate-300 dark:border-white/[0.08] flex flex-col items-center justify-center gap-0.5 text-slate-400 dark:text-slate-500 hover:text-red-500 hover:border-red-300 hover:bg-red-50/50 dark:hover:bg-red-950/30 transition-all cursor-pointer flex-shrink-0"
           title="清空全部参考图"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,21 +328,21 @@ export default function InputBar() {
   const renderParams = (cols: string) => (
     <div className={`grid ${cols} gap-2 text-xs flex-1`}>
       <label className="flex flex-col gap-0.5">
-        <span className="text-gray-400 dark:text-gray-500 ml-1">比例</span>
+        <span className="text-slate-400 dark:text-slate-500 ml-1">比例</span>
         <button
           type="button"
           onClick={() => setShowSizePicker(true)}
-          className="px-3 py-1.5 rounded-xl border border-gray-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.06] focus:outline-none text-xs text-left transition-all duration-200 shadow-sm font-mono"
+          className="px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.06] focus:outline-none text-xs text-left transition-all duration-200 shadow-sm font-mono"
           title="选择图像比例"
         >
           {params.size || DEFAULT_PARAMS.size}
         </button>
-        <span className="ml-1 truncate font-mono text-[10px] text-gray-400 dark:text-gray-500">
+        <span className="ml-1 truncate font-mono text-[10px] text-slate-400 dark:text-slate-500">
           {params.base_resolution} · gpt-image-2{params.base_resolution === 'auto' ? ' · 比例不下发' : ''}
         </span>
       </label>
       <label className="flex flex-col gap-0.5">
-        <span className="text-gray-400 dark:text-gray-500 ml-1">质量</span>
+        <span className="text-slate-400 dark:text-slate-500 ml-1">质量</span>
         <Select
           value={params.quality}
           onChange={(val) => setParams({ quality: val as any })}
@@ -343,7 +356,7 @@ export default function InputBar() {
         />
       </label>
       <label className="flex flex-col gap-0.5">
-        <span className="text-gray-400 dark:text-gray-500 ml-1">格式</span>
+        <span className="text-slate-400 dark:text-slate-500 ml-1">格式</span>
         <Select
           value={params.output_format}
           onChange={(val) => setParams({ output_format: val as any })}
@@ -356,7 +369,7 @@ export default function InputBar() {
         />
       </label>
       <label className="flex flex-col gap-0.5">
-        <span className="text-gray-400 dark:text-gray-500 ml-1">基准</span>
+        <span className="text-slate-400 dark:text-slate-500 ml-1">基准</span>
         <Select
           value={params.base_resolution}
           onChange={(val) => setParams({ base_resolution: val as any })}
@@ -370,7 +383,7 @@ export default function InputBar() {
         />
       </label>
       <label className="flex flex-col gap-0.5">
-        <span className="text-gray-400 dark:text-gray-500 ml-1">审核</span>
+        <span className="text-slate-400 dark:text-slate-500 ml-1">审核</span>
         <Select
           value={params.moderation}
           onChange={(val) => setParams({ moderation: val as any })}
@@ -382,7 +395,7 @@ export default function InputBar() {
         />
       </label>
       <label className="flex flex-col gap-0.5">
-        <span className="text-gray-400 dark:text-gray-500 ml-1">数量</span>
+        <span className="text-slate-400 dark:text-slate-500 ml-1">数量</span>
         <input
           value={nInput}
           onChange={(e) => setNInput(e.target.value)}
@@ -390,7 +403,7 @@ export default function InputBar() {
           type="number"
           min={1}
           max={4}
-          className="px-3 py-1.5 rounded-xl border border-gray-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] focus:outline-none text-xs transition-all duration-200 shadow-sm"
+          className="px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] focus:outline-none text-xs transition-all duration-200 shadow-sm"
         />
       </label>
     </div>
@@ -400,17 +413,17 @@ export default function InputBar() {
     <>
       {/* 全屏拖拽遮罩 */}
       {isDragging && (
-        <div className="fixed inset-0 z-[100] bg-white/60 dark:bg-gray-900/60 backdrop-blur-md flex flex-col items-center justify-center pointer-events-none">
+        <div className="fixed inset-0 z-[100] bg-white/60 dark:bg-slate-900/60 backdrop-blur-md flex flex-col items-center justify-center pointer-events-none">
           <div className="flex flex-col items-center gap-4 p-8 rounded-3xl">
             <div className={`w-20 h-20 rounded-full border-2 border-dashed flex items-center justify-center ${
-              atImageLimit ? 'bg-red-50 dark:bg-red-500/10 border-red-300' : 'bg-blue-50 dark:bg-blue-500/10 border-blue-400'
+              atImageLimit ? 'bg-red-50 dark:bg-red-500/10 border-red-300' : 'bg-teal-50 dark:bg-teal-500/10 border-teal-400'
             }`}>
               {atImageLimit ? (
                 <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                 </svg>
               ) : (
-                <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               )}
@@ -441,15 +454,15 @@ export default function InputBar() {
         />
       )}
 
-      <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 w-full max-w-4xl px-3 sm:px-4 transition-all duration-300">
-        <div ref={cardRef} className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl border border-white/50 dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] rounded-2xl sm:rounded-3xl p-3 sm:p-4 ring-1 ring-black/5 dark:ring-white/10">
+      <div className="fixed bottom-2 left-1/2 z-30 w-full max-w-4xl -translate-x-1/2 px-2 transition-all duration-300 sm:bottom-6 sm:px-4">
+        <div ref={cardRef} className={`bg-stone-50/85 dark:bg-slate-900/85 backdrop-blur-2xl border border-white/50 dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] ring-1 ring-black/5 dark:ring-white/10 transition-all duration-200 ${mobileCollapsed ? 'rounded-2xl p-2.5 sm:rounded-3xl sm:p-4' : 'rounded-3xl p-3 sm:p-4'}`}>
           {/* 移动端拖动条 */}
           <div
             ref={handleRef}
             className="sm:hidden flex justify-center pt-0.5 pb-2 -mt-1 cursor-pointer touch-none"
             onClick={() => setMobileCollapsed((v) => !v)}
           >
-            <div className={`w-10 h-1 rounded-full bg-gray-300 dark:bg-white/[0.06] transition-transform duration-200 ${mobileCollapsed ? 'scale-x-75' : ''}`} />
+            <div className={`w-10 h-1 rounded-full bg-slate-300 dark:bg-white/[0.06] transition-transform duration-200 ${mobileCollapsed ? 'scale-x-75' : ''}`} />
           </div>
 
           {/* 输入图片行（移动端可折叠） */}
@@ -462,7 +475,7 @@ export default function InputBar() {
                   </div>
                 </div>
                 {mobileCollapsed && (
-                  <div className="text-xs text-gray-400 dark:text-gray-500 mb-2 ml-1">{inputImages.length} 张参考图</div>
+                  <div className="mb-2 ml-1 text-xs text-slate-400 dark:text-slate-500">{inputImages.length} 张参考图</div>
                 )}
               </>
             ) : (
@@ -476,13 +489,16 @@ export default function InputBar() {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={() => {
+              if (isMobile) setMobileCollapsed(false)
+            }}
             rows={1}
-            placeholder="描述你想生成的图片..."
-            className="w-full px-4 py-3 rounded-2xl border border-gray-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] text-sm focus:outline-none leading-relaxed resize-none shadow-sm transition-[border-color,box-shadow] duration-200"
+            placeholder={mobileCollapsed && isMobile ? '描述画面...' : '描述你想生成的图片...'}
+            className={`w-full rounded-2xl border border-slate-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] text-sm focus:outline-none leading-relaxed resize-none shadow-sm transition-[border-color,box-shadow,height] duration-200 ${mobileCollapsed && isMobile ? 'px-3.5 py-2.5' : 'px-4 py-3'}`}
           />
 
           {/* 参数 + 按钮 */}
-          <div className="mt-3">
+          <div className={`${mobileCollapsed && isMobile ? 'mt-2' : 'mt-3'}`}>
             {/* 桌面端布局 */}
             <div className="hidden sm:flex items-end justify-between gap-3">
               {renderParams('grid-cols-6')}
@@ -498,8 +514,8 @@ export default function InputBar() {
                     onClick={() => !atImageLimit && fileInputRef.current?.click()}
                     className={`p-2.5 rounded-xl transition-all shadow-sm ${
                       atImageLimit
-                        ? 'bg-gray-200 dark:bg-white/[0.04] text-gray-300 dark:text-gray-500 cursor-not-allowed'
-                        : 'bg-gray-200 dark:bg-white/[0.06] hover:bg-gray-300 dark:hover:bg-white/[0.1] text-gray-500 dark:text-gray-300 hover:shadow'
+                        ? 'bg-slate-200 dark:bg-white/[0.04] text-slate-300 dark:text-slate-500 cursor-not-allowed'
+                        : 'bg-slate-200 dark:bg-white/[0.06] hover:bg-slate-300 dark:hover:bg-white/[0.1] text-slate-500 dark:text-slate-300 hover:shadow'
                     }`}
                     title={atImageLimit ? `已达上限 ${API_MAX_IMAGES} 张` : '添加参考图'}
                   >
@@ -514,7 +530,7 @@ export default function InputBar() {
                   <button
                     onClick={() => submitTask()}
                     disabled={!canSubmit}
-                    className="p-2.5 rounded-xl transition-all shadow-sm hover:shadow bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-white/[0.04] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2.5 rounded-xl transition-all shadow-sm hover:shadow bg-teal-600 text-white hover:bg-teal-700 disabled:bg-slate-300 dark:disabled:bg-white/[0.04] disabled:opacity-50 disabled:cursor-not-allowed"
                     title="生成 (Ctrl+Enter)"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -535,6 +551,16 @@ export default function InputBar() {
               </div>
 
               <div className="flex items-center gap-2">
+                {mobileCollapsed && (
+                  <button
+                    type="button"
+                    onClick={() => setMobileCollapsed(false)}
+                    className="flex-shrink-0 rounded-xl border border-slate-200/70 bg-white/60 px-3 py-2.5 text-xs font-medium text-slate-500 shadow-sm transition hover:bg-white dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-300"
+                    title="展开输入栏"
+                  >
+                    展开
+                  </button>
+                )}
                 <div
                   className="relative"
                   onMouseEnter={() => setAttachHover(true)}
@@ -545,8 +571,8 @@ export default function InputBar() {
                     onClick={() => !atImageLimit && fileInputRef.current?.click()}
                     className={`p-2.5 rounded-xl transition-all shadow-sm flex-shrink-0 ${
                       atImageLimit
-                        ? 'bg-gray-200 dark:bg-white/[0.04] text-gray-300 dark:text-gray-500 cursor-not-allowed'
-                        : 'bg-gray-200 dark:bg-white/[0.06] hover:bg-gray-300 dark:hover:bg-white/[0.1] text-gray-500 dark:text-gray-300'
+                        ? 'bg-slate-200 dark:bg-white/[0.04] text-slate-300 dark:text-slate-500 cursor-not-allowed'
+                        : 'bg-slate-200 dark:bg-white/[0.06] hover:bg-slate-300 dark:hover:bg-white/[0.1] text-slate-500 dark:text-slate-300'
                     }`}
                     title={atImageLimit ? `已达上限 ${API_MAX_IMAGES} 张` : '添加参考图'}
                   >
@@ -561,7 +587,7 @@ export default function InputBar() {
                   <button
                     onClick={() => submitTask()}
                     disabled={!canSubmit}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-white/[0.04] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm bg-teal-600 text-white hover:bg-teal-700 disabled:bg-slate-300 dark:disabled:bg-white/[0.04] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />

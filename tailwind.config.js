@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        gray: colors.zinc,
+        gray: colors.slate,
       },
       fontFamily: {
         sans: ['var(--font-ui-sans)'],

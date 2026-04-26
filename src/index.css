@@ -8,6 +8,48 @@
 :root {
   --font-ui-sans: 'HarmonyOS Sans SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-mono: 'Maple Mono', 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(20, 184, 166, 0.08), transparent 24%),
+    radial-gradient(circle at 85% 12%, rgba(245, 158, 11, 0.08), transparent 22%),
+    linear-gradient(180deg, #fcfcfb 0%, #f7f5f1 52%, #f4f1eb 100%);
+  background-color: #f7f5f1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    background:
+      radial-gradient(circle at top left, rgba(45, 212, 191, 0.1), transparent 24%),
+      radial-gradient(circle at 85% 12%, rgba(251, 191, 36, 0.08), transparent 22%),
+      linear-gradient(180deg, #07111a 0%, #08111d 48%, #0b1322 100%);
+    background-color: #08111d;
+  }
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: #0f172a;
+  font-family: var(--font-ui-sans);
+  background: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #e2e8f0;
+  }
 }
 
 * {
@@ -17,7 +59,7 @@
 
 @media (prefers-color-scheme: dark) {
   * {
-    scrollbar-color: #3f3f46 transparent;
+    scrollbar-color: #475569 transparent;
   }
 }
 
@@ -37,8 +79,8 @@ input[type="number"] {
 }
 
 @media (prefers-color-scheme: dark) {
-  ::-webkit-scrollbar-thumb { background: #3f3f46; }
-  ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+  ::-webkit-scrollbar-thumb { background: #475569; }
+  ::-webkit-scrollbar-thumb:hover { background: #64748b; }
 }
 
 @keyframes pulse-border {

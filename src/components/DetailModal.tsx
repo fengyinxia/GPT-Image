@@ -155,11 +155,11 @@ export default function DetailModal() {
     >
       <div className="absolute inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-md animate-overlay-in" />
       <div
-        className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-white/50 dark:border-white/[0.08] rounded-3xl shadow-[0_8px_40px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.4)] max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row z-10 ring-1 ring-black/5 dark:ring-white/10 animate-modal-in"
+        className="relative bg-stone-50/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-white/[0.08] rounded-3xl shadow-[0_8px_40px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.4)] max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row z-10 ring-1 ring-black/5 dark:ring-white/10 animate-modal-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 左侧：图片 */}
-        <div ref={imagePanelRef} className="md:w-1/2 w-full h-64 md:h-auto bg-gray-100 dark:bg-black/20 relative flex items-center justify-center flex-shrink-0 min-h-[16rem]">
+        <div ref={imagePanelRef} className="md:w-1/2 w-full h-64 md:h-auto bg-slate-100 dark:bg-black/20 relative flex items-center justify-center flex-shrink-0 min-h-[16rem]">
           {task.status === 'done' && outputLen > 0 && (
             <>
               <img
@@ -233,7 +233,7 @@ export default function DetailModal() {
             </>
           )}
           {task.status === 'running' && (
-            <svg className="w-10 h-10 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+            <svg className="w-10 h-10 text-teal-400 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
@@ -273,7 +273,7 @@ export default function DetailModal() {
         <div className="md:w-1/2 w-full p-5 overflow-y-auto flex flex-col">
           <button
             onClick={() => setDetailTaskId(null)}
-            className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/[0.06] transition text-gray-400 z-10"
+            className="absolute top-3 right-3 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-white/[0.06] transition text-slate-400 z-10"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -281,17 +281,17 @@ export default function DetailModal() {
           </button>
 
           <div className="flex-1">
-            <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+            <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
               输入内容
             </h3>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap mb-4">
+            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap mb-4">
               {task.prompt || '(无提示词)'}
             </p>
 
             {/* 参考图 */}
             {task.inputImageIds?.length > 0 && (
               <div className="mb-4">
-                <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
                   参考图
                 </h3>
                 <div className="flex gap-2 flex-wrap">
@@ -299,7 +299,7 @@ export default function DetailModal() {
                     <img
                       key={imgId}
                       src={imageSrcs[imgId] || ''}
-                      className="w-16 h-16 rounded-lg object-cover border border-gray-200 dark:border-white/[0.08] cursor-pointer hover:opacity-80 transition"
+                      className="w-16 h-16 rounded-lg object-cover border border-slate-200 dark:border-white/[0.08] cursor-pointer hover:opacity-80 transition"
                       onClick={() => setLightboxImageId(imgId, task.inputImageIds)}
                       alt=""
                     />
@@ -309,61 +309,61 @@ export default function DetailModal() {
             )}
 
             {/* 参数 */}
-            <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+            <h3 className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
               参数配置
             </h3>
             <div className="grid grid-cols-2 gap-2 text-xs mb-4">
-              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                <span className="text-gray-400 dark:text-gray-500">模型</span>
+              <div className="bg-slate-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-slate-400 dark:text-slate-500">模型</span>
                 <br />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">gpt-image-2</span>
+                <span className="text-slate-700 dark:text-slate-300 font-medium">gpt-image-2</span>
               </div>
-              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                <span className="text-gray-400 dark:text-gray-500">基准分辨率</span>
+              <div className="bg-slate-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-slate-400 dark:text-slate-500">基准分辨率</span>
                 <br />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">
+                <span className="text-slate-700 dark:text-slate-300 font-medium">
                   {(task.params as any).base_resolution ?? ((task.params as any).model === 'gpt-image-2-4k' ? '4K' : (task.params as any).model === 'gpt-image-2-2k' ? '2K' : '1K')}
                 </span>
               </div>
-              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                <span className="text-gray-400 dark:text-gray-500">图像比例</span>
+              <div className="bg-slate-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-slate-400 dark:text-slate-500">图像比例</span>
                 <br />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.size}</span>
+                <span className="text-slate-700 dark:text-slate-300 font-medium">{task.params.size}</span>
               </div>
-              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                <span className="text-gray-400 dark:text-gray-500">质量</span>
+              <div className="bg-slate-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-slate-400 dark:text-slate-500">质量</span>
                 <br />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.quality}</span>
+                <span className="text-slate-700 dark:text-slate-300 font-medium">{task.params.quality}</span>
               </div>
-              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                <span className="text-gray-400 dark:text-gray-500">格式</span>
+              <div className="bg-slate-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-slate-400 dark:text-slate-500">格式</span>
                 <br />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.output_format}</span>
+                <span className="text-slate-700 dark:text-slate-300 font-medium">{task.params.output_format}</span>
               </div>
-              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                <span className="text-gray-400 dark:text-gray-500">审核</span>
+              <div className="bg-slate-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-slate-400 dark:text-slate-500">审核</span>
                 <br />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.moderation}</span>
+                <span className="text-slate-700 dark:text-slate-300 font-medium">{task.params.moderation}</span>
               </div>
-              <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                <span className="text-gray-400 dark:text-gray-500">数量</span>
+              <div className="bg-slate-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
+                <span className="text-slate-400 dark:text-slate-500">数量</span>
                 <br />
-                <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.n}</span>
+                <span className="text-slate-700 dark:text-slate-300 font-medium">{task.params.n}</span>
               </div>
             </div>
 
             {/* 时间 */}
-            <div className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+            <div className="text-xs text-slate-400 dark:text-slate-500 mb-4">
               <span>创建于 {formatTime(task.createdAt)}</span>
               {formatDuration() && <span> · 耗时 {formatDuration()}</span>}
             </div>
           </div>
 
           {/* 操作按钮 */}
-          <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-white/[0.08]">
+          <div className="flex gap-2 pt-3 border-t border-slate-200 dark:border-white/[0.08]">
             <button
               onClick={handleReuse}
-              className="flex-1 flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition text-xs sm:text-sm font-medium whitespace-nowrap"
+              className="flex-1 flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-500/20 transition text-xs sm:text-sm font-medium whitespace-nowrap"
             >
               <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />

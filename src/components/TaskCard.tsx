@@ -85,20 +85,21 @@ export default function TaskCard({
 
   return (
     <div
-      className={`bg-white dark:bg-gray-900 rounded-xl border overflow-hidden cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+      className={`group relative overflow-hidden rounded-[22px] border bg-stone-50/80 shadow-[0_12px_32px_rgb(15,23,42,0.05)] ring-1 ring-black/5 transition-all hover:-translate-y-1 hover:shadow-[0_18px_40px_rgb(15,23,42,0.1)] dark:bg-slate-900/80 dark:ring-white/10 dark:shadow-[0_14px_36px_rgb(0,0,0,0.28)] ${
         task.status === 'running'
-          ? 'border-blue-400 generating'
-          : 'border-gray-200 dark:border-white/[0.08]'
+          ? 'border-teal-300/90 generating dark:border-teal-400/40'
+          : 'border-white/60 dark:border-white/[0.08]'
       }`}
       onClick={onClick}
     >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.08),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(245,158,11,0.07),transparent_26%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="flex h-40">
         {/* 左侧图片区域 */}
-        <div className="w-40 min-w-[10rem] h-full bg-gray-100 dark:bg-black/20 relative flex items-center justify-center overflow-hidden flex-shrink-0">
+        <div className="relative flex h-full w-40 min-w-[10rem] flex-shrink-0 items-center justify-center overflow-hidden bg-slate-100/90 dark:bg-black/20">
           {task.status === 'running' && (
             <div className="flex flex-col items-center gap-2">
               <svg
-                className="w-8 h-8 text-blue-400 animate-spin"
+                className="w-8 h-8 text-teal-400 animate-spin"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -116,7 +117,7 @@ export default function TaskCard({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 />
               </svg>
-              <span className="text-xs text-gray-400 dark:text-gray-500">生成中...</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500">生成中...</span>
             </div>
           )}
           {task.status === 'error' && (
@@ -143,12 +144,12 @@ export default function TaskCard({
             <>
               <img
                 src={thumbSrc}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 loading="lazy"
                 alt=""
               />
               {task.outputImages.length > 1 && (
-                <span className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                <span className="absolute bottom-2 right-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
                   {task.outputImages.length}
                 </span>
               )}
@@ -172,7 +173,7 @@ export default function TaskCard({
           {/* 运行中显示耗时，完成后显示封面图比例与分辨率标签 */}
           <div className="absolute top-1.5 left-1.5 flex items-center gap-1">
             {task.status !== 'done' || !coverRatio || !coverSize ? (
-              <span className="flex items-center gap-1 bg-black/50 text-white text-[10px] sm:text-xs px-1.5 py-0.5 rounded backdrop-blur-sm font-mono">
+              <span className="flex items-center gap-1 rounded-full border border-white/10 bg-black/55 px-2 py-1 text-[10px] text-white backdrop-blur-sm sm:text-xs font-mono">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -180,10 +181,10 @@ export default function TaskCard({
               </span>
             ) : (
               <>
-                <span className="bg-black/50 text-white text-[10px] sm:text-xs px-1.5 py-0.5 rounded backdrop-blur-sm font-mono">
+                <span className="rounded-full border border-white/10 bg-black/55 px-2 py-1 text-[10px] text-white backdrop-blur-sm sm:text-xs font-mono">
                   {coverRatio}
                 </span>
-                <span className="bg-black/50 text-white/90 text-[10px] sm:text-xs px-1.5 py-0.5 rounded backdrop-blur-sm font-medium">
+                <span className="rounded-full border border-white/10 bg-black/55 px-2 py-1 text-[10px] font-medium text-white/90 backdrop-blur-sm sm:text-xs">
                   {coverSize}
                 </span>
               </>
@@ -192,36 +193,47 @@ export default function TaskCard({
         </div>
 
         {/* 右侧信息区域 */}
-        <div className="flex-1 p-3 flex flex-col min-w-0">
-          <div className="flex-1 min-h-0 mb-2">
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3">
+        <div className="relative flex min-w-0 flex-1 flex-col p-3.5">
+          <div className="mb-2 flex min-h-0 flex-1 flex-col">
+            <div className="mb-2 flex items-center gap-1.5">
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${
+                task.status === 'done'
+                  ? 'bg-teal-50 text-teal-700 dark:bg-teal-400/10 dark:text-teal-200'
+                  : task.status === 'running'
+                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-400/10 dark:text-amber-200'
+                    : 'bg-rose-50 text-rose-600 dark:bg-rose-400/10 dark:text-rose-200'
+              }`}>
+                {task.status === 'done' ? 'Done' : task.status === 'running' ? 'Running' : 'Failed'}
+              </span>
+            </div>
+            <p className="line-clamp-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
               {task.prompt || '(无提示词)'}
             </p>
           </div>
-          <div className="mt-auto flex flex-col gap-1.5">
+          <div className="mt-auto flex flex-col gap-2">
             {/* 参数：横向滚动 */}
-            <div className="flex overflow-x-auto hide-scrollbar gap-1.5 whitespace-nowrap mask-edge-r min-w-0 pr-2">
-              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
+            <div className="mask-edge-r flex min-w-0 gap-1.5 overflow-x-auto whitespace-nowrap pr-2 hide-scrollbar">
+              <span className="flex-shrink-0 rounded-full border border-slate-200/70 bg-white/70 px-2 py-1 text-xs text-slate-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-300">
                 {task.params.quality}
               </span>
-              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
+              <span className="flex-shrink-0 rounded-full border border-amber-200/80 bg-amber-50/70 px-2 py-1 text-xs text-amber-700 dark:border-amber-300/15 dark:bg-amber-300/10 dark:text-amber-100">
                 {(task.params as any).base_resolution ?? ((task.params as any).model === 'gpt-image-2-4k' ? '4K' : (task.params as any).model === 'gpt-image-2-2k' ? '2K' : '1K')}
               </span>
-              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
+              <span className="flex-shrink-0 rounded-full border border-teal-200/80 bg-teal-50/70 px-2 py-1 text-xs font-mono text-teal-700 dark:border-teal-300/15 dark:bg-teal-300/10 dark:text-teal-100">
                 {task.params.size}
               </span>
-              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.04] text-gray-500 dark:text-gray-400 flex-shrink-0">
+              <span className="flex-shrink-0 rounded-full border border-slate-200/70 bg-white/70 px-2 py-1 text-xs text-slate-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-300">
                 {task.params.output_format}
               </span>
             </div>
             {/* 操作按钮 */}
             <div
-              className="flex gap-1 justify-end flex-shrink-0"
+              className="flex shrink-0 justify-end gap-1.5"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={onReuse}
-                className="p-1.5 rounded-md hover:bg-blue-50 dark:hover:bg-blue-950/30 text-gray-400 hover:text-blue-500 transition"
+                className="grid h-8 w-8 place-items-center rounded-xl border border-slate-200/70 bg-white/60 text-slate-400 shadow-sm transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-400 dark:hover:border-teal-300/15 dark:hover:bg-teal-400/10"
                 title="复用配置"
               >
                 <svg
@@ -240,7 +252,7 @@ export default function TaskCard({
               </button>
               <button
                 onClick={onEditOutputs}
-                className="p-1.5 rounded-md hover:bg-green-50 dark:hover:bg-green-950/30 text-gray-400 hover:text-green-500 transition disabled:opacity-30"
+                className="grid h-8 w-8 place-items-center rounded-xl border border-slate-200/70 bg-white/60 text-slate-400 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-30 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-400 dark:hover:border-emerald-300/15 dark:hover:bg-emerald-400/10"
                 title="编辑输出"
                 disabled={!task.outputImages?.length}
               >
@@ -260,7 +272,7 @@ export default function TaskCard({
               </button>
               <button
                 onClick={onDelete}
-                className="p-1.5 rounded-md hover:bg-red-50 dark:hover:bg-red-950/30 text-gray-400 hover:text-red-500 transition"
+                className="grid h-8 w-8 place-items-center rounded-xl border border-slate-200/70 bg-white/60 text-slate-400 shadow-sm transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-400 dark:hover:border-rose-300/15 dark:hover:bg-rose-400/10"
                 title="删除记录"
               >
                 <svg
