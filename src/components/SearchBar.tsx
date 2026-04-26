@@ -8,7 +8,7 @@ export default function SearchBar() {
   const setFilterStatus = useStore((s) => s.setFilterStatus)
 
   return (
-    <div className="relative mt-6 mb-5 overflow-visible rounded-[26px] border border-white/60 bg-stone-50/80 p-3 shadow-[0_10px_30px_rgb(15,23,42,0.06)] ring-1 ring-black/5 backdrop-blur-xl dark:border-white/[0.08] dark:bg-slate-900/70 dark:ring-white/10 dark:shadow-[0_10px_30px_rgb(0,0,0,0.24)]">
+    <div className="relative z-30 mt-6 mb-5 overflow-visible rounded-[26px] border border-white/60 bg-stone-50/80 p-3 shadow-[0_10px_30px_rgb(15,23,42,0.06)] ring-1 ring-black/5 backdrop-blur-xl dark:border-white/[0.08] dark:bg-slate-900/70 dark:ring-white/10 dark:shadow-[0_10px_30px_rgb(0,0,0,0.24)]">
       <div className="pointer-events-none absolute inset-0 rounded-[26px] bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.08),transparent_32%),radial-gradient(circle_at_85%_30%,rgba(245,158,11,0.08),transparent_28%)]" />
       <div className="relative flex flex-col gap-3 sm:flex-row">
         <div className="relative z-20 w-full shrink-0 sm:w-36">

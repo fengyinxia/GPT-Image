@@ -85,7 +85,7 @@ export default function TaskCard({
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-[22px] border bg-stone-50/80 shadow-[0_12px_32px_rgb(15,23,42,0.05)] ring-1 ring-black/5 transition-all hover:-translate-y-1 hover:shadow-[0_18px_40px_rgb(15,23,42,0.1)] dark:bg-slate-900/80 dark:ring-white/10 dark:shadow-[0_14px_36px_rgb(0,0,0,0.28)] ${
+      className={`group relative z-0 overflow-hidden rounded-[22px] border bg-stone-50/80 shadow-[0_12px_32px_rgb(15,23,42,0.05)] ring-1 ring-black/5 transition-all hover:-translate-y-1 hover:shadow-[0_18px_40px_rgb(15,23,42,0.1)] dark:bg-slate-900/80 dark:ring-white/10 dark:shadow-[0_14px_36px_rgb(0,0,0,0.28)] ${
         task.status === 'running'
           ? 'border-teal-300/90 generating dark:border-teal-400/40'
           : 'border-white/60 dark:border-white/[0.08]'
