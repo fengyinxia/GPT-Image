@@ -325,7 +325,7 @@ export default function InputBar() {
           {params.size || DEFAULT_PARAMS.size}
         </button>
         <span className="ml-1 truncate font-mono text-[10px] text-gray-400 dark:text-gray-500">
-          {params.base_resolution} · gpt-image-2
+          {params.base_resolution} · gpt-image-2{params.base_resolution === 'auto' ? ' · 比例不下发' : ''}
         </span>
       </label>
       <label className="flex flex-col gap-0.5">
@@ -435,6 +435,7 @@ export default function InputBar() {
       {showSizePicker && (
         <SizePickerModal
           currentSize={params.size}
+          currentBaseResolution={params.base_resolution}
           onSelect={(size) => setParams({ size })}
           onClose={() => setShowSizePicker(false)}
         />

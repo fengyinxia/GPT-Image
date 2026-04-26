@@ -13,6 +13,10 @@ function roundToMultiple(value: number, multiple: number) {
   return Math.max(multiple, Math.round(value / multiple) * multiple)
 }
 
+function floorToMultiple(value: number, multiple: number) {
+  return Math.max(multiple, Math.floor(value / multiple) * multiple)
+}
+
 export function normalizeImageSize(size: string) {
   const trimmed = size.trim()
   const match = trimmed.match(SIZE_PATTERN)
@@ -93,7 +97,7 @@ export function calculateImageSize(tier: SizeTier, ratio: string) {
   const base = STANDARD_BASE_SIZES[tier]
   const basePixels = base.width * base.height
   const ratioScale = Math.sqrt(basePixels / (ratioWidth * ratioHeight))
-  const width = roundToMultiple(ratioWidth * ratioScale, 16)
-  const height = roundToMultiple(ratioHeight * ratioScale, 16)
+  const width = floorToMultiple(ratioWidth * ratioScale, 16)
+  const height = floorToMultiple(ratioHeight * ratioScale, 16)
   return `${width}x${height}`
 }

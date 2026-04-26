@@ -14,6 +14,7 @@ const RATIO_OPTIONS = [
 
 interface Props {
   currentSize: string
+  currentBaseResolution: 'auto' | '1K' | '2K' | '4K'
   onSelect: (size: string) => void
   onClose: () => void
 }
@@ -46,7 +47,7 @@ function PreviewBox({ ratio, tone }: { ratio: string; tone: string }) {
   )
 }
 
-export default function SizePickerModal({ currentSize, onSelect, onClose }: Props) {
+export default function SizePickerModal({ currentSize, currentBaseResolution, onSelect, onClose }: Props) {
   const [ratio, setRatio] = useState(() => findRatioForSize(currentSize))
 
   const selected = RATIO_OPTIONS.find((item) => item.value === ratio) ?? RATIO_OPTIONS[0]
@@ -107,6 +108,11 @@ export default function SizePickerModal({ currentSize, onSelect, onClose }: Prop
           <div className="mt-1 text-xs text-gray-400 dark:text-gray-500">
             图像比例
           </div>
+          {currentBaseResolution === 'auto' && (
+            <div className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+              当前基准为 auto，所选比例不会下发到上游。
+            </div>
+          )}
         </div>
 
         <div className="mt-5 flex gap-2">
