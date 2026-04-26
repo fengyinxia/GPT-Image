@@ -3,6 +3,12 @@ const RATIO_PATTERN = /^\s*(\d+(?:\.\d+)?)\s*[:xX×]\s*(\d+(?:\.\d+)?)\s*$/
 
 export type SizeTier = '1K' | '2K' | '4K'
 
+const STANDARD_BASE_SIZES: Record<SizeTier, { width: number; height: number }> = {
+  '1K': { width: 1920, height: 1080 },
+  '2K': { width: 2560, height: 1440 },
+  '4K': { width: 3840, height: 2160 },
+}
+
 function roundToMultiple(value: number, multiple: number) {
   return Math.max(multiple, Math.round(value / multiple) * multiple)
 }
@@ -84,28 +90,10 @@ export function calculateImageSize(tier: SizeTier, ratio: string) {
   if (!parsed) return null
 
   const { width: ratioWidth, height: ratioHeight } = parsed
-  if (ratioWidth === ratioHeight) {
-    const side = tier === '1K' ? 1024 : tier === '2K' ? 2048 : 3840
-    return `${side}x${side}`
-  }
-
-  if (tier === '1K') {
-    const shortSide = 1024
-    const width = ratioWidth > ratioHeight
-      ? roundToMultiple(shortSide * ratioWidth / ratioHeight, 16)
-      : shortSide
-    const height = ratioWidth > ratioHeight
-      ? shortSide
-      : roundToMultiple(shortSide * ratioHeight / ratioWidth, 16)
-    return `${width}x${height}`
-  }
-
-  const longSide = tier === '2K' ? 2048 : 3840
-  const width = ratioWidth > ratioHeight
-    ? longSide
-    : roundToMultiple(longSide * ratioWidth / ratioHeight, 16)
-  const height = ratioWidth > ratioHeight
-    ? roundToMultiple(longSide * ratioHeight / ratioWidth, 16)
-    : longSide
+  const base = STANDARD_BASE_SIZES[tier]
+  const basePixels = base.width * base.height
+  const ratioScale = Math.sqrt(basePixels / (ratioWidth * ratioHeight))
+  const width = roundToMultiple(ratioWidth * ratioScale, 16)
+  const height = roundToMultiple(ratioHeight * ratioScale, 16)
   return `${width}x${height}`
 }

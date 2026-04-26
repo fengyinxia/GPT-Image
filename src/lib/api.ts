@@ -49,12 +49,12 @@ function resolveRequestSize(params: TaskParams): string {
   const size = params.size || '1:1'
   if (params.base_resolution === 'auto') return 'auto'
   if (parseRatio(size)) {
-    return normalizeImageSize(calculateImageSize(params.base_resolution as SizeTier, size) ?? '1024x1024')
+    return normalizeImageSize(calculateImageSize(params.base_resolution as SizeTier, size) ?? '1920x1080')
   }
   if (size !== 'auto') return normalizeImageSize(size)
-  if (params.base_resolution === '2K') return '2048x2048'
+  if (params.base_resolution === '2K') return '2560x1440'
   if (params.base_resolution === '4K') return '3840x2160'
-  return '1024x1024'
+  return '1920x1080'
 }
 
 export interface CallApiOptions {
