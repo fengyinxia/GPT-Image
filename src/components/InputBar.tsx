@@ -1,7 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react'
 import { useStore, submitTask, addImageFromFile } from '../store'
 import { DEFAULT_PARAMS } from '../types'
-import { normalizeImageSize } from '../lib/size'
 import Select from './Select'
 import SizePickerModal from './SizePickerModal'
 
@@ -316,14 +315,14 @@ export default function InputBar() {
   const renderParams = (cols: string) => (
     <div className={`grid ${cols} gap-2 text-xs flex-1`}>
       <label className="flex flex-col gap-0.5">
-        <span className="text-gray-400 dark:text-gray-500 ml-1">尺寸</span>
+        <span className="text-gray-400 dark:text-gray-500 ml-1">比例</span>
         <button
           type="button"
           onClick={() => setShowSizePicker(true)}
           className="px-3 py-1.5 rounded-xl border border-gray-200/60 dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] hover:bg-white dark:hover:bg-white/[0.06] focus:outline-none text-xs text-left transition-all duration-200 shadow-sm font-mono"
-          title="选择尺寸"
+          title="选择图像比例"
         >
-          {normalizeImageSize(params.size) || DEFAULT_PARAMS.size}
+          {params.size || DEFAULT_PARAMS.size}
         </button>
         <span className="ml-1 truncate font-mono text-[10px] text-gray-400 dark:text-gray-500">
           {params.base_resolution} · gpt-image-2
@@ -436,7 +435,6 @@ export default function InputBar() {
       {showSizePicker && (
         <SizePickerModal
           currentSize={params.size}
-          currentBaseResolution={params.base_resolution}
           onSelect={(size) => setParams({ size })}
           onClose={() => setShowSizePicker(false)}
         />

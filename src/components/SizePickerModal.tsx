@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { calculateImageSize, normalizeImageSize, type SizeTier } from '../lib/size'
+import { useState } from 'react'
+import { parseRatio } from '../lib/size'
 
 const RATIO_OPTIONS = [
   { label: '1:1', value: '1:1', tone: 'bg-blue-500' },
@@ -14,14 +14,15 @@ const RATIO_OPTIONS = [
 
 interface Props {
   currentSize: string
-  currentBaseResolution: SizeTier | 'auto'
   onSelect: (size: string) => void
   onClose: () => void
 }
 
-function findRatioForSize(size: string, tier: SizeTier) {
-  const normalized = normalizeImageSize(size)
-  return RATIO_OPTIONS.find((ratio) => calculateImageSize(tier, ratio.value) === normalized)?.value
+function findRatioForSize(size: string) {
+  if (parseRatio(size)) {
+    return RATIO_OPTIONS.find((ratio) => ratio.value === size)?.value ?? '1:1'
+  }
+  return '1:1'
 }
 
 function parseRatioValue(ratio: string) {
@@ -45,16 +46,13 @@ function PreviewBox({ ratio, tone }: { ratio: string; tone: string }) {
   )
 }
 
-export default function SizePickerModal({ currentSize, currentBaseResolution, onSelect, onClose }: Props) {
-  const tier: SizeTier = currentBaseResolution === 'auto' ? '1K' : currentBaseResolution
-  const [ratio, setRatio] = useState(() => findRatioForSize(currentSize, tier) ?? '1:1')
+export default function SizePickerModal({ currentSize, onSelect, onClose }: Props) {
+  const [ratio, setRatio] = useState(() => findRatioForSize(currentSize))
 
   const selected = RATIO_OPTIONS.find((item) => item.value === ratio) ?? RATIO_OPTIONS[0]
-  const previewSize = useMemo(() => normalizeImageSize(calculateImageSize(tier, ratio) ?? ''), [tier, ratio])
 
   const applySize = () => {
-    if (!previewSize) return
-    onSelect(previewSize)
+    onSelect(ratio)
     onClose()
   }
 
@@ -68,7 +66,7 @@ export default function SizePickerModal({ currentSize, currentBaseResolution, on
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">选择图像比例</h3>
-            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">当前：{currentSize || 'auto'}</p>
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">当前：{parseRatio(currentSize) ? currentSize : '1:1'}</p>
           </div>
           <button
             onClick={onClose}
@@ -104,10 +102,10 @@ export default function SizePickerModal({ currentSize, currentBaseResolution, on
         <div className="mt-5 rounded-2xl bg-gray-50 px-4 py-3 dark:bg-white/[0.03]">
           <div className="text-xs text-gray-400 dark:text-gray-500">将使用</div>
           <div className="mt-1 font-mono text-lg font-semibold text-gray-800 dark:text-gray-100">
-            {previewSize || '尺寸无效'}
+            {selected.label}
           </div>
           <div className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-            {selected.label} · 基准 {currentBaseResolution}
+            图像比例
           </div>
         </div>
 
@@ -120,7 +118,6 @@ export default function SizePickerModal({ currentSize, currentBaseResolution, on
           </button>
           <button
             onClick={applySize}
-            disabled={!previewSize}
             className="flex-1 rounded-xl bg-blue-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             确定

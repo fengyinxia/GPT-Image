@@ -326,7 +326,7 @@ export default function DetailModal() {
                 </span>
               </div>
               <div className="bg-gray-50 dark:bg-white/[0.03] rounded-lg px-3 py-2">
-                <span className="text-gray-400 dark:text-gray-500">尺寸</span>
+                <span className="text-gray-400 dark:text-gray-500">图像比例</span>
                 <br />
                 <span className="text-gray-700 dark:text-gray-300 font-medium">{task.params.size}</span>
               </div>

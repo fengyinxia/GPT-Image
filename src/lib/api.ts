@@ -1,4 +1,5 @@
 import type { AppSettings, ImageApiResponse, TaskParams } from '../types'
+import { calculateImageSize, normalizeImageSize, parseRatio, type SizeTier } from './size'
 
 const MIME_MAP: Record<string, string> = {
   png: 'image/png',
@@ -45,8 +46,12 @@ async function fetchImageUrlAsDataUrl(url: string, fallbackMime: string, signal:
 }
 
 function resolveRequestSize(params: TaskParams): string {
-  if (params.size && params.size !== 'auto') return params.size
+  const size = params.size || '1:1'
   if (params.base_resolution === 'auto') return 'auto'
+  if (parseRatio(size)) {
+    return normalizeImageSize(calculateImageSize(params.base_resolution as SizeTier, size) ?? '1024x1024')
+  }
+  if (size !== 'auto') return normalizeImageSize(size)
   if (params.base_resolution === '2K') return '2048x2048'
   if (params.base_resolution === '4K') return '3840x2160'
   return '1024x1024'

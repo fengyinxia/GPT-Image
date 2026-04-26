@@ -23,7 +23,7 @@ export type BaseResolution = 'auto' | '1K' | '2K' | '4K'
 
 export const DEFAULT_PARAMS: TaskParams = {
   base_resolution: 'auto',
-  size: 'auto',
+  size: '1:1',
   quality: 'auto',
   output_format: 'png',
   moderation: 'auto',
