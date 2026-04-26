@@ -46,6 +46,7 @@ async function fetchImageUrlAsDataUrl(url: string, fallbackMime: string, signal:
 
 function resolveRequestSize(params: TaskParams): string {
   if (params.size && params.size !== 'auto') return params.size
+  if (params.base_resolution === 'auto') return 'auto'
   if (params.base_resolution === '2K') return '2048x2048'
   if (params.base_resolution === '4K') return '3840x2160'
   return '1024x1024'

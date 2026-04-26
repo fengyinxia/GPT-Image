@@ -19,10 +19,10 @@ export interface TaskParams {
   n: number
 }
 
-export type BaseResolution = '1K' | '2K' | '4K'
+export type BaseResolution = 'auto' | '1K' | '2K' | '4K'
 
 export const DEFAULT_PARAMS: TaskParams = {
-  base_resolution: '1K',
+  base_resolution: 'auto',
   size: 'auto',
   quality: 'auto',
   output_format: 'png',

@@ -362,6 +362,7 @@ export default function InputBar() {
           value={params.base_resolution}
           onChange={(val) => setParams({ base_resolution: val as any })}
           options={[
+            { label: 'auto', value: 'auto' },
             { label: '1K', value: '1K' },
             { label: '2K', value: '2K' },
             { label: '4K', value: '4K' },
@@ -436,7 +437,7 @@ export default function InputBar() {
         <SizePickerModal
           currentSize={params.size}
           currentBaseResolution={params.base_resolution}
-          onSelect={(size, baseResolution) => setParams({ size, base_resolution: baseResolution })}
+          onSelect={(size) => setParams({ size })}
           onClose={() => setShowSizePicker(false)}
         />
       )}
