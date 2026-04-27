@@ -85,7 +85,7 @@ export default function TaskCard({
 
   return (
     <div
-      className={`group relative z-0 overflow-hidden rounded-[22px] border bg-stone-50/80 shadow-[0_12px_32px_rgb(15,23,42,0.05)] ring-1 ring-black/5 transition-all hover:-translate-y-1 hover:shadow-[0_18px_40px_rgb(15,23,42,0.1)] dark:bg-slate-900/80 dark:ring-white/10 dark:shadow-[0_14px_36px_rgb(0,0,0,0.28)] ${
+      className={`group relative z-0 overflow-hidden rounded-[22px] border bg-stone-50/80 shadow-[0_12px_32px_rgb(15,23,42,0.05)] ring-1 ring-black/5 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgb(15,23,42,0.1)] dark:bg-slate-900/80 dark:ring-white/10 dark:shadow-[0_14px_36px_rgb(0,0,0,0.28)] ${
         task.status === 'running'
           ? 'border-teal-300/90 generating dark:border-teal-400/40'
           : 'border-white/60 dark:border-white/[0.08]'
@@ -95,7 +95,7 @@ export default function TaskCard({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.08),transparent_34%),radial-gradient(circle_at_86%_14%,rgba(245,158,11,0.07),transparent_26%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="flex h-40">
         {/* 左侧图片区域 */}
-        <div className="relative flex h-full w-40 min-w-[10rem] flex-shrink-0 items-center justify-center overflow-hidden bg-slate-100/90 dark:bg-black/20">
+        <div className="relative flex h-full w-40 min-w-[10rem] flex-shrink-0 items-center justify-center overflow-hidden rounded-l-[22px] bg-slate-100/90 dark:bg-black/20">
           {task.status === 'running' && (
             <div className="flex flex-col items-center gap-2">
               <svg
