@@ -17,28 +17,21 @@ Fork 自 [https://github.com/CookSleep/gpt_image_playground](https://github.com/
 
 ### Docker
 
-1. 创建本地配置文件：
+1. 创建 `.env` 文件：
 
-```bash
-cp backend/config.local.json.example backend/config.local.json
+```env
+OPENAI_API_KEY=sk-xxxx
+OPENAI_BASE_URL=https://api.openai.com
+OPENAI_TIMEOUT=300
 ```
 
-2. 编辑 `backend/config.local.json`，至少填这两个字段：
-
-```json
-{
-  "openai_api_key": "sk-xxxx",
-  "openai_base_url": "https://api.openai.com"
-}
-```
-
-3. 启动：
+2. 启动：
 
 ```bash
 docker compose up -d --build
 ```
 
-4. 访问：
+3. 访问：
 
 ```text
 http://localhost:3399
@@ -56,11 +49,10 @@ docker compose down
 
 ```bash
 cd backend
-cp config.local.json.example config.local.json
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000
+OPENAI_API_KEY=sk-xxxx OPENAI_BASE_URL=https://api.openai.com uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 再启动前端：
@@ -78,17 +70,45 @@ http://localhost:5173
 
 ## 配置
 
-后端优先读取 `backend/config.local.json`，不存在时再回退到环境变量。
+后端通过环境变量读取配置。Docker Compose 会自动加载项目根目录的 `.env` 文件。
 
 常用字段：
 
-- `openai_api_key` / `OPENAI_API_KEY`：必填
-- `openai_base_url` / `OPENAI_BASE_URL`：上游 OpenAI 兼容 API 根地址
-- `openai_timeout` / `OPENAI_TIMEOUT`：请求超时，默认 `300`
-- `cors_allow_origins` / `CORS_ALLOW_ORIGINS`：本地开发跨域白名单
-- `http_proxy` / `HTTP_PROXY`：仅显式配置时启用代理
+| 变量 | 必填 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `OPENAI_API_KEY` | 是 | 无 | 后端请求上游 OpenAI 兼容接口使用的 API Key。 |
+| `OPENAI_BASE_URL` | 否 | `https://api.openai.com` | 上游 OpenAI 兼容 API 根地址。后端会拼接 `/v1/images/generations`、`/v1/images/edits` 和 `/v1/chat/completions`。 |
+| `OPENAI_TIMEOUT` | 否 | `300` | 后端请求上游接口的超时时间，单位秒。 |
+| `GENERATED_IMAGE_DIR` | 否 | `/data/generated` | 后端保存生成图片的目录。Docker Compose 中固定为 `/data/generated`，并映射到宿主机 `./data/generated`。 |
 
-`backend/config.local.json` 已加入 `.gitignore`。
+可选高级字段：
+
+| 变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `CORS_ALLOW_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | 本地开发跨域白名单。Docker 访问通常经 Nginx 同源代理，不需要配置。 |
+| `HTTP_PROXY` | 空 | 后端访问上游接口时使用的 HTTP 代理。仅在确实需要代理访问上游时配置。 |
+
+`.env` 已加入 `.gitignore`，不要提交真实密钥。
+
+前端设置里的“任务等待超时 (秒)”只控制浏览器等待后台图片任务完成的最长时间；后端请求上游接口的超时仍由 `OPENAI_TIMEOUT` 控制。
+
+## 使用限制
+
+为避免误操作导致费用或资源异常，项目内置以下限制：
+
+| 项目 | 限制 |
+| --- | --- |
+| 同时运行的图片任务 | 最多 3 个 |
+| 单次图片任务请求体 | 最大 64MB |
+| 参考图数量 | 最多 16 张 |
+| 单张参考图 | 最大 16MB |
+| 单次参考图总大小 | 最大 48MB |
+| 导入 ZIP 文件 | 最大 256MB |
+| 导入 ZIP 解压后总大小 | 最大 512MB |
+| 导入 `manifest.json` | 最大 10MB |
+| 单张导入图片 | 最大 64MB |
+| 单次导入任务数 | 最多 2000 条 |
+| 单次导入图片数 | 最多 2000 张 |
 
 ## 模型与尺寸
 
